@@ -1,0 +1,7 @@
+# One source per line: CSV / JSON / XML files or RSS/Atom feed URLs.
+# Export searches from your tender portals / aggregators and list them here, then run:
+#   tender-radar scan sources.txt --html out/report.html --csv out/report.csv
+data/sample_tenders.csv
+# exports/gem_ai_search.csv
+# exports/eprocure_it_services.csv
+# https://example.org/tenders/feed.xml

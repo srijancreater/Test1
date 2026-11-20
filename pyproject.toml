@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tender-radar"
+version = "0.1.0"
+description = "Find, classify and rank AI / digital-transformation tenders"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+tender-radar = "tender_radar.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["tender_radar*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

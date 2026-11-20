@@ -1,0 +1,119 @@
+# Tender Radar — target category taxonomy.
+#
+# Each category has:
+#   keywords   : phrases that signal a match (case-insensitive, whole-word)
+#   strong     : high-signal phrases worth extra weight
+#   exclude    : phrases that suggest a false positive (reduce score)
+#   weight     : business priority multiplier (1.0 = normal)
+#
+# Edit freely — no code changes needed.
+
+[settings]
+min_score = 3.0            # tenders below this are dropped
+keyword_points = 1.0
+strong_points = 3.0
+exclude_penalty = 4.0
+title_multiplier = 2.0     # matches in the title count more than in the description
+urgent_days = 7            # deadlines within this many days are flagged urgent
+
+# Generic disqualifiers applied to every tender (pure supply / civil works etc.)
+global_exclude = [
+  "civil work", "construction of building", "road construction", "supply of furniture",
+  "stationery", "housekeeping", "catering", "manpower supply only", "diesel generator",
+]
+
+[categories.genai]
+name = "AI / Generative AI implementation"
+weight = 1.5
+keywords = ["artificial intelligence", "ai", "machine learning", "ml", "deep learning",
+            "nlp", "natural language processing", "llm", "predictive model", "ai platform",
+            "ai solution", "model training", "neural network"]
+strong = ["generative ai", "genai", "gen ai", "large language model", "retrieval augmented",
+          "rag", "ai implementation", "ai-based solution", "foundation model"]
+exclude = []
+
+[categories.chatbot]
+name = "Chatbots and AI assistants"
+weight = 1.4
+keywords = ["chatbot", "chat bot", "virtual assistant", "conversational", "helpdesk bot",
+            "whatsapp bot", "ivr", "voice assistant", "grievance bot", "faq bot"]
+strong = ["ai chatbot", "ai assistant", "conversational ai", "multilingual chatbot",
+          "voice bot", "voicebot", "copilot"]
+exclude = []
+
+[categories.automation]
+name = "Automation and workflow digitization"
+weight = 1.2
+keywords = ["automation", "workflow", "digitization", "digitisation", "e-office",
+            "paperless", "bpm", "business process", "file tracking", "online approval",
+            "e-governance", "process re-engineering"]
+strong = ["robotic process automation", "rpa", "workflow automation", "intelligent automation",
+          "workflow management system", "end-to-end digitization"]
+exclude = ["building automation", "plc"]
+
+[categories.analytics]
+name = "Data analytics and dashboards"
+weight = 1.2
+keywords = ["dashboard", "analytics", "business intelligence", "bi", "data warehouse",
+            "data lake", "mis", "reporting", "kpi", "visualization", "visualisation",
+            "power bi", "tableau", "data platform"]
+strong = ["data analytics platform", "predictive analytics", "command dashboard",
+          "decision support system", "advanced analytics", "real-time dashboard"]
+exclude = []
+
+[categories.ocr]
+name = "OCR / document processing"
+weight = 1.3
+keywords = ["ocr", "scanning", "document management", "dms", "digitization of records",
+            "record digitization", "data entry", "indexing", "metadata", "archival"]
+strong = ["optical character recognition", "intelligent document processing", "idp",
+          "handwriting recognition", "icr", "document ai", "ai-based ocr"]
+exclude = ["scanner supply"]
+
+[categories.surveillance]
+name = "AI-based monitoring and surveillance analytics"
+weight = 1.3
+keywords = ["cctv", "surveillance", "video management", "vms", "camera", "monitoring",
+            "anpr", "face recognition", "facial recognition", "crowd", "traffic violation"]
+strong = ["video analytics", "ai-based surveillance", "ai video analytics",
+          "intelligent traffic management", "itms", "computer vision", "anomaly detection"]
+exclude = ["supply of cctv cameras only", "camera repair"]
+
+[categories.software]
+name = "Software development with AI integration"
+weight = 1.1
+keywords = ["software development", "application development", "web portal", "mobile app",
+            "mobile application", "web application", "portal development", "api",
+            "custom software", "sdlc", "erp"]
+strong = ["ai integration", "ai-enabled application", "ai enabled portal",
+          "intelligent application", "ai-powered"]
+exclude = ["software license renewal", "antivirus"]
+
+[categories.poc]
+name = "PoC / pilot projects"
+weight = 1.4
+keywords = ["pilot", "proof of concept", "poc", "prototype", "sandbox", "pilot project",
+            "innovation challenge", "hackathon", "startup challenge"]
+strong = ["proof of concept", "pilot implementation", "poc for ai", "ai pilot",
+          "expression of interest for pilot"]
+exclude = []
+
+[categories.smartcity]
+name = "Smart city and citizen services"
+weight = 1.2
+keywords = ["smart city", "citizen services", "iccc", "command and control centre",
+            "command and control center", "municipal", "grievance", "public service delivery",
+            "citizen portal", "e-services", "property tax", "urban local body", "ulb"]
+strong = ["integrated command and control", "smart city mission", "citizen engagement platform",
+          "one-stop citizen", "digital twin"]
+exclude = []
+
+[categories.modernization]
+name = "IT modernization (AI-ready)"
+weight = 1.0
+keywords = ["modernization", "modernisation", "legacy", "migration", "cloud migration",
+            "re-architecture", "upgradation", "digital transformation", "it infrastructure",
+            "data centre", "microservices", "system integrator", "system integration"]
+strong = ["legacy modernization", "application modernization", "cloud-native",
+          "digital transformation with ai", "ai readiness"]
+exclude = ["ups", "air conditioner"]
