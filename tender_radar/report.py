@@ -120,6 +120,11 @@ sel.value=sel.value===b.dataset.cat?'':b.dataset.cat;apply()}));
 
 
 def write_html(tenders: list[Tender], config: Config, path: str | Path, today: date | None = None) -> None:
+    Path(path).write_text(render_html(tenders, config, today), encoding="utf-8")
+
+
+def render_html(tenders: list[Tender], config: Config, today: date | None = None,
+                header_extra: str = "", subtitle: str = "") -> str:
     today = today or date.today()
     e = html.escape
     counts = Counter(k for t in tenders for k in t.categories)
@@ -162,7 +167,8 @@ def write_html(tenders: list[Tender], config: Config, path: str | Path, today: d
     page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Tender Radar</title>
 <style>{_CSS}</style></head><body><main>
-<h1>Tender Radar</h1><p class="sub">AI &amp; digital transformation opportunities · generated {today:%d %b %Y}</p>
+<h1>Tender Radar</h1><p class="sub">AI &amp; digital transformation opportunities · {e(subtitle) or "generated"} {today:%d %b %Y}</p>
+{header_extra}
 <section class="stats">
 <div class="stat"><b>{len(tenders)}</b><span>Matching tenders</span></div>
 <div class="stat"><b>{format_value(total_value) if total_value else "—"}</b><span>Combined est. value</span></div>
@@ -176,4 +182,4 @@ def write_html(tenders: list[Tender], config: Config, path: str | Path, today: d
 <option value="pilot">Pilot</option><option value="multi-fit">Multi-fit</option></select></div>
 <p class="sub">Showing <span id="count">{len(tenders)}</span> tenders</p>
 {body}</main><script>{_JS}</script></body></html>"""
-    Path(path).write_text(page, encoding="utf-8")
+    return page

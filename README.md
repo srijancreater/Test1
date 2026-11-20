@@ -92,6 +92,17 @@ Tune everything in `config/categories.toml`; run `tender-radar explain` to see t
 4. **Respond:** start the proposal from the matching section of `docs/category-playbooks.md`.
 5. **Track:** import the CSV into your bid tracker or CRM.
 
+## Web app (Vercel)
+
+`api/index.py` is a Vercel Python function that serves the dashboard. `vercel.json` routes every path to it.
+
+- `GET /` shows the demo tenders, scored against today's date.
+- Upload a CSV / JSON / RSS export in the page to scan your own tenders. Files are processed in memory and not stored.
+- `GET /health` is a liveness check.
+
+The Vercel project is linked to this GitHub repository, so every push redeploys.
+Run it locally with `vercel dev`, or use the CLI as above.
+
 ## Tests
 
 ```bash

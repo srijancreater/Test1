@@ -1,0 +1,1 @@
+# Tender Radar has no third-party runtime dependencies (stdlib only).
