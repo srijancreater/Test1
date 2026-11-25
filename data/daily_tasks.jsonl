@@ -1,0 +1,8 @@
+{"skill": "calculate", "args": {"expression": "2450*0.15"}}
+{"skill": "split_bill", "args": {"total": 186.4, "people": 4, "tip_percent": 12}}
+{"skill": "plan_my_day", "args": {"tasks": "gym, emails, project review, groceries"}}
+{"skill": "notes.append_todo", "args": {"item": "renew passport"}}
+{"skill": "calendar.add_event", "args": {"title": "Dentist", "start": "2026-12-02T10:30", "minutes": 45}}
+{"goal": "Summarize: Q3 revenue grew 12%. Churn fell to 2.1%. Hiring is paused until January. Marketing budget moves to events."}
+{"skill": "webhook.notify", "args": {"text": "Daily chores finished"}}
+{"skill": "email.send", "args": {"to": "me@example.com", "subject": "Daily digest", "body": "All done."}}

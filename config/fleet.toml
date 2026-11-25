@@ -1,0 +1,55 @@
+# Agent Fleet configuration. Edit and re-run; no code changes needed.
+
+[fleet]
+llm = "auto"                 # auto (Claude if ANTHROPIC_API_KEY / `ant auth login` present, else offline) | claude | offline
+model = "claude-opus-5-5"    # worker model
+planner_model = "claude-opus-5-5"
+effort = "medium"            # worker effort: low | medium | high | xhigh | max  (planner always runs at high)
+max_concurrency = 16         # concurrent Claude requests across the whole fleet (protects your rate limit)
+workspace = ".fleet"         # files, outbox, calendar.ics, notes.json, fleet.db live here
+approval_policy = "ask"      # ask: side-effect skills wait for `approve`; auto: run them; deny: never
+auto_approve = ["webhook.notify"]   # side-effect skills that never need a human
+skill_dirs = ["skills_contrib"]     # drop *.py files with @skill functions here to add skills
+
+# One manager per department. Workers inherit every skill tagged `department:<name>`, plus `skills`.
+[[department]]
+name = "research"
+manager = "Research Manager"
+description = "Look things up, read pages and documents, summarize, compare."
+workers = 250
+
+[[department]]
+name = "comms"
+manager = "Communications Manager"
+description = "Draft and send email, post notifications, reply to people."
+workers = 200
+
+[[department]]
+name = "ops"
+manager = "Operations Manager"
+description = "Calendar, reminders, todo lists, files, notes - the daily-life admin."
+workers = 300
+
+[[department]]
+name = "finance"
+manager = "Finance Manager"
+description = "Budgets, expenses, invoices, calculations."
+workers = 100
+
+[[department]]
+name = "data"
+manager = "Data Manager"
+description = "CSV/JSON crunching, statistics, conversions."
+workers = 150
+
+# Recurring jobs run by `python -m agent_fleet serve`.
+[[schedule]]
+name = "morning-brief"
+goal = "List my calendar events; then summarize today's todo list notes"
+at = "07:45"
+days = ["mon", "tue", "wed", "thu", "fri"]
+
+[[schedule]]
+name = "hourly-inbox-check"
+goal = "Read files/inbox.txt and extract action items; then save them as a note"
+every_minutes = 60

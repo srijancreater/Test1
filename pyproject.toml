@@ -5,19 +5,21 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "tender-radar"
 version = "0.1.0"
-description = "Find, classify and rank AI / digital-transformation tenders"
+description = "Tender Radar + Agent Fleet (orchestrator, managers, thousands of worker agents)"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = []
 
 [project.optional-dependencies]
 dev = ["pytest>=7"]
+claude = ["anthropic>=2.14"]
 
 [project.scripts]
 tender-radar = "tender_radar.cli:main"
+agent-fleet = "agent_fleet.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["tender_radar*"]
+include = ["tender_radar*", "agent_fleet*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
