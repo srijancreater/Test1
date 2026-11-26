@@ -161,7 +161,13 @@ class Multiverse:
     async def _summarize(self, goal: str, steps: list[dict[str, Any]]) -> str:
         if len(steps) == 1:
             s = steps[0]
-            return str(s["output"]) if s["ok"] else f"failed: {s['error']}"
+            out = s["output"]
+            if not s["ok"]:
+                return f"failed: {s['error']}"
+            if isinstance(out, dict) and "summary" in out:  # lookup result
+                src = f"\n\nSource: {out['source']}" if out.get("source") else ""
+                return f"{out.get('title', '')}: {out['summary']}{src}".lstrip(": ")
+            return out if isinstance(out, str) else json.dumps(out, default=str)
         if self.llm.is_live:
             return await self.llm.complete(
                 f"Goal: {goal}\n\nStep results:\n{json.dumps(steps, default=str)[:30000]}\n\n"

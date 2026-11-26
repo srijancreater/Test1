@@ -262,3 +262,9 @@ def test_lookup_is_deterministic_and_reports_misses(fleet, fake_wiki):
 def test_summarize_with_text_still_summarizes(fleet, fake_wiki):
     rep = run(fleet.run("Summarize: Revenue grew 12%. Churn fell to 2.1%. Hiring is paused."))
     assert rep.ok and not fake_wiki
+
+
+def test_lookup_report_summary_is_plain_text(fleet, fake_wiki):
+    rep = run(fleet.run("Who is Mark Zuckerberg?"))
+    assert rep.summary.startswith("Mark Zuckerberg: Mark Elliot Zuckerberg")
+    assert rep.summary.endswith("https://en.wikipedia.org/wiki/Mark_Zuckerberg")
