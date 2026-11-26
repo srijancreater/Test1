@@ -70,6 +70,8 @@ _KEYWORDS: list[tuple[str, str, str]] = [
     (r"\b(send|reply)\b.*\b(e-?mail|mail)\b|\b(e-?mail|mail)\b.*\b(send|reply)\b", "comms", "email.send"),
     (r"\b(draft|write)\b.*\b(e-?mail|letter|message)\b", "comms", "draft_email"),
     (r"\b(notify|announce|post to|slack|teams)\b", "comms", "webhook.notify"),
+    (r"\b(summary|overview|profile|bio(graphy)?|info(rmation)?|facts)\s+(of|on|about|for)\b(?!.*:)"
+     r"|^\s*(who|what|where)\s+(is|was|are|were)\b|\btell me about\b|\blook\s*up\b|\bwikipedia\b", "research", "lookup"),
     (r"\b(summar|tl;?dr|digest)", "research", "summarize"),
     (r"\b(keyword|topics?)\b", "research", "extract_keywords"),
     (r"\b(fetch|download|scrape|visit|https?://)", "research", "http.get"),

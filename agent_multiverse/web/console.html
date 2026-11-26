@@ -86,6 +86,9 @@ ol.steps::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width
 .step .who em{font-style:normal;color:var(--c)}
 .out{margin-top:8px;background:#f7f7fb;border:1px solid var(--edge);border-radius:var(--r-sm);padding:10px 12px;
   font-size:14px;white-space:pre-wrap;word-break:break-word;max-height:180px;overflow:auto}
+.fact{margin-top:8px;border:1px solid var(--edge);border-radius:var(--r-sm);padding:14px 16px;background:#fff}
+.fact h4{margin:0 0 2px;font-size:16px}.fact .desc{margin:0 0 8px;color:var(--mist);font-size:13.5px}
+.fact p{margin:0 0 10px;font-size:14.5px;line-height:1.6}.fact a{font-size:13px;color:var(--violet)}
 .out.err{border-color:rgba(214,51,108,.35);color:#b42343}
 .summary{margin-top:6px;padding:16px;border-radius:var(--r-md);background:rgba(20,18,43,.04);border:1px solid var(--edge);white-space:pre-wrap;font-size:15px}
 .meter{display:grid;gap:10px;margin-top:6px}
@@ -238,6 +241,7 @@ const IDEAS = [
   'Calculate 2450*0.15; then draft an email to sam@example.com about the tip',
   'Summarize: Q3 revenue grew 12%. Churn fell to 2.1%. Hiring is paused until January.',
   'Split a 186 bill between 4 people',
+  'Get a summary of Mark Zuckerberg',
 ];
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt = n => Number(n).toLocaleString();
@@ -380,6 +384,15 @@ function busy(on, label) {
   if (on) $('out').innerHTML = `<div class="empty"><p>${label}</p></div>`;
 }
 function show(v) { return typeof v === 'string' ? v : JSON.stringify(v, null, 2); }
+function body(s) {
+  const v = s.output;
+  if (s.ok && v && typeof v === 'object' && 'summary' in v && 'found' in v) {
+    if (!v.found) return `<div class="out">${esc(v.summary)}</div>`;
+    return `<div class="fact"><h4>${esc(v.title)}</h4>${v.description ? `<p class="desc">${esc(v.description)}</p>` : ''}
+      <p>${esc(v.summary)}</p><a href="${esc(v.source)}" target="_blank" rel="noopener">Source: Wikipedia</a></div>`;
+  }
+  return `<div class="out${s.ok ? '' : ' err'}">${esc(s.ok ? show(v) : s.error)}</div>`;
+}
 
 $('run').onclick = async () => {
   const goal = $('goal').value.trim();
@@ -400,7 +413,7 @@ $('run').onclick = async () => {
           <span class="n">${i + 1}</span>
           <h3>${esc(s.goal)}</h3>
           <div class="who"><em>${esc(NAMES[s.department] || s.department || 'Agent')}</em> handled it with ${esc(s.skill || 'reasoning')}${s.worker ? ', worker ' + esc(s.worker) : ''}</div>
-          <div class="out${s.ok ? '' : ' err'}">${esc(s.ok ? show(s.output) : s.error)}</div>
+          ${body(s)}
         </li>`).join('')}</ol>
       ${d.steps.length > 1 && !/^\[(ok|FAIL)\]/.test(d.summary) ? `<div class="summary">${esc(d.summary)}</div>` : ''}`;
   } catch (e) {

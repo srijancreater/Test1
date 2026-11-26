@@ -6,7 +6,10 @@ import csv
 import io
 import operator
 import re
+import json
 import statistics
+import urllib.parse
+import urllib.request
 from collections import Counter
 
 from .skills import skill
@@ -117,3 +120,63 @@ async def answer(question: str, context: str = "", ctx=None) -> str:
     if ctx is not None and ctx.fleet.llm.is_live:
         return await ctx.llm(f"{context}\n\nQuestion: {question}" if context else question)
     return f"[offline] {question}" + (f" (context: {len(context)} chars)" if context else "")
+
+
+# ---------------------------------------------------------------- deterministic facts (Wikipedia)
+
+WIKI = "https://en.wikipedia.org"
+_TOPIC_PREFIXES = [re.compile(p, re.I) for p in (
+    r"^please\s+",
+    r"^(can|could|would)\s+you\s+",
+    r"^(get|give|find|show|fetch|write|make)\s+(me\s+)?",
+    r"^(a|an|the)\s+",
+    r"^(short|quick|brief|full)\s+",
+    r"^(summary|overview|profile|biography|bio|information|info|facts|details)\s+(of|on|about|for)\s+",
+    r"^(who|what|where)\s+(is|was|are|were)\s+",
+    r"^tell\s+me\s+about\s+",
+    r"^look\s*up\s+",
+    r"^search\s+(wikipedia\s+)?for\s+",
+)]
+
+
+def clean_topic(text: str) -> str:
+    """'Get a summary of Mark Zuckerberg.' -> 'Mark Zuckerberg'"""
+    t = text.strip().split("\n")[0].strip()
+    changed = True
+    while changed:
+        changed = False
+        for p in _TOPIC_PREFIXES:
+            new = p.sub("", t, count=1)
+            if new != t:
+                t, changed = new.strip(), True
+    t = re.sub(r"\s+on\s+wikipedia$", "", t, flags=re.I)
+    return t.strip(" ?.!:;\"'") or text.strip()
+
+
+def _wiki_get(url: str) -> dict:
+    req = urllib.request.Request(url, headers={"User-Agent": "agent-multiverse/0.1 (deterministic lookup skill)",
+                                               "Accept": "application/json"})
+    with urllib.request.urlopen(req, timeout=10) as r:  # noqa: S310 - fixed https host
+        return json.loads(r.read().decode("utf-8"))
+
+
+@skill(tags={"department:research", "department:comms", "department:ops", "department:finance", "department:data"})
+def lookup(topic: str) -> dict:
+    """Look up a person, place, company, event or idea on Wikipedia and return a sourced summary.
+    The same question returns the same published facts every time."""
+    q = clean_topic(topic)
+    found = _wiki_get(f"{WIKI}/w/api.php?action=query&list=search&srlimit=1&format=json&srsearch="
+                      + urllib.parse.quote(q))
+    hits = found.get("query", {}).get("search", [])
+    if not hits:
+        return {"found": False, "topic": q, "summary": f"Wikipedia has no article matching \u201c{q}\u201d. "
+                                                         "Try the full name or a different spelling."}
+    title = hits[0]["title"]
+    page = _wiki_get(f"{WIKI}/api/rest_v1/page/summary/" + urllib.parse.quote(title.replace(" ", "_"), safe=""))
+    return {
+        "found": True,
+        "title": page.get("title", title),
+        "description": page.get("description", ""),
+        "summary": page.get("extract", ""),
+        "source": page.get("content_urls", {}).get("desktop", {}).get("page", f"{WIKI}/wiki/{title.replace(' ', '_')}"),
+    }

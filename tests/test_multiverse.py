@@ -201,3 +201,64 @@ def test_claude_refusal_raises():
         SimpleNamespace(stop_reason="refusal", stop_details=SimpleNamespace(category="cyber"), content=[])])))
     with pytest.raises(RuntimeError, match="declined"):
         run(b.complete("hi"))
+
+
+# ---- deterministic facts: Wikipedia lookup (network replaced by recorded responses)
+
+WIKI_FIXTURES = {
+    "search": {"query": {"search": [{"title": "Mark Zuckerberg"}]}},
+    "summary": {"title": "Mark Zuckerberg", "description": "American businessman (born 1984)",
+                "extract": "Mark Elliot Zuckerberg is an American businessman who co-founded Facebook.",
+                "content_urls": {"desktop": {"page": "https://en.wikipedia.org/wiki/Mark_Zuckerberg"}}},
+}
+
+
+@pytest.fixture
+def fake_wiki(monkeypatch):
+    from agent_multiverse import builtin_skills
+    calls = []
+
+    def fake(url):
+        calls.append(url)
+        if "list=search" in url:
+            return {"query": {"search": []}} if "Nonexistentxyz" in url else WIKI_FIXTURES["search"]
+        return WIKI_FIXTURES["summary"]
+
+    monkeypatch.setattr(builtin_skills, "_wiki_get", fake)
+    return calls
+
+
+@pytest.mark.parametrize("text,topic", [
+    ("Get a summary of Mark Zuckerberg.", "Mark Zuckerberg"),
+    ("Who is Ada Lovelace?", "Ada Lovelace"),
+    ("Tell me about the Eiffel Tower", "Eiffel Tower"),
+    ("summary of Infosys", "Infosys"),
+    ("Please give me a short biography of Sachin Tendulkar", "Sachin Tendulkar"),
+])
+def test_clean_topic(text, topic):
+    from agent_multiverse.builtin_skills import clean_topic
+    assert clean_topic(text) == topic
+
+
+def test_summary_of_person_returns_sourced_facts(fleet, fake_wiki):
+    rep = run(fleet.run("Get a summary of Mark Zuckerberg."))
+    assert rep.ok and rep.steps[0]["skill"] in (None, "lookup")
+    out = rep.steps[0]["output"]
+    assert out["found"] and out["title"] == "Mark Zuckerberg"
+    assert "co-founded Facebook" in out["summary"]
+    assert out["source"].startswith("https://en.wikipedia.org/wiki/")
+    assert "srsearch=Mark%20Zuckerberg" in fake_wiki[0]
+    assert rep.steps[0]["worker"].startswith("research-")
+
+
+def test_lookup_is_deterministic_and_reports_misses(fleet, fake_wiki):
+    a = run(fleet.submit(Task(goal="x", skill="lookup", args={"topic": "Mark Zuckerberg"}))).output
+    b = run(fleet.submit(Task(goal="x", skill="lookup", args={"topic": "Mark Zuckerberg"}))).output
+    assert a == b
+    miss = run(fleet.submit(Task(goal="x", skill="lookup", args={"topic": "Nonexistentxyz"}))).output
+    assert miss["found"] is False and "no article" in miss["summary"]
+
+
+def test_summarize_with_text_still_summarizes(fleet, fake_wiki):
+    rep = run(fleet.run("Summarize: Revenue grew 12%. Churn fell to 2.1%. Hiring is paused."))
+    assert rep.ok and not fake_wiki
