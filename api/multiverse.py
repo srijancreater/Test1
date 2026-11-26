@@ -1,14 +1,14 @@
-"""Vercel Python function: Agent Fleet console + JSON API.
+"""Vercel Python function: Agent Multiverse console + JSON API.
 
-GET  /fleet                 web console
-GET  /fleet/api/status      departments, managers, worker counts
-GET  /fleet/api/skills      skill catalog
-POST /fleet/api/run         {"goal": "..."}                 plan + execute a goal
-POST /fleet/api/task        {"skill": "...", "args": {...}} run one skill
-POST /fleet/api/demo        {"tasks": 2000}                 stress test across the whole fleet
+GET  /multiverse            web console   (/fleet/... still works as an alias)
+GET  /multiverse/api/status      departments, managers, worker counts
+GET  /multiverse/api/skills      skill catalog
+POST /multiverse/api/run         {"goal": "..."}                 plan + execute a goal
+POST /multiverse/api/task        {"skill": "...", "args": {...}} run one skill
+POST /multiverse/api/demo        {"tasks": 2000}                 stress test across the whole multiverse
 
 Public-safety rules (this URL is reachable by anyone):
-* Without a valid `Authorization: Bearer $FLEET_ACCESS_TOKEN`, requests run on the OFFLINE backend
+* Without a valid `Authorization: Bearer $MULTIVERSE_ACCESS_TOKEN`, requests run on the OFFLINE backend
   (no Claude spend), outbound HTTP skills are removed, and side-effect skills are denied.
 * With the token (and ANTHROPIC_API_KEY set in Vercel), requests use Claude; side effects are still
   only parked for approval - the serverless filesystem is ephemeral, so approve from the CLI instead.
@@ -29,25 +29,25 @@ from urllib.parse import urlparse
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from agent_fleet.fleet import build_fleet, load_config  # noqa: E402
-from agent_fleet.models import Task  # noqa: E402
+from agent_multiverse.multiverse import build_multiverse, load_config  # noqa: E402
+from agent_multiverse.models import Task  # noqa: E402
 
 MAX_BODY = 256 * 1024
 MAX_DEMO = 5000
-WORKSPACE = Path(os.environ.get("FLEET_WORKSPACE", "/tmp/agent-fleet"))
+WORKSPACE = Path(os.environ.get("MULTIVERSE_WORKSPACE", "/tmp/agent-multiverse"))
 PUBLIC_EXCLUDE = ["http.get", "http.post_json"]
 
 
 def authorized(headers) -> bool:
-    token = os.environ.get("FLEET_ACCESS_TOKEN", "")
+    token = os.environ.get("MULTIVERSE_ACCESS_TOKEN", "")
     got = (headers.get("Authorization") or "").removeprefix("Bearer ").strip()
     return bool(token) and hmac.compare_digest(token, got)
 
 
 def make_fleet(trusted: bool):
-    cfg = load_config(ROOT / "config" / "fleet.toml")
-    cfg.setdefault("fleet", {})["store"] = ":memory:"
-    return build_fleet(cfg, llm=("auto" if trusted else "offline"), workspace=WORKSPACE,
+    cfg = load_config(ROOT / "config" / "multiverse.toml")
+    cfg.setdefault("multiverse", {})["store"] = ":memory:"
+    return build_multiverse(cfg, llm=("auto" if trusted else "offline"), workspace=WORKSPACE,
                        approval_policy="ask" if trusted else "deny",
                        exclude_skills=None if trusted else PUBLIC_EXCLUDE)
 
@@ -82,7 +82,11 @@ class handler(BaseHTTPRequestHandler):
 
     def _route(self) -> str:
         p = urlparse(self.path).path.rstrip("/")
-        return p.removeprefix("/api/fleet").removeprefix("/fleet") or "/"
+        for prefix in ("/api/multiverse", "/multiverse", "/fleet"):
+            if p == prefix or p.startswith(prefix + "/"):
+                p = p[len(prefix):]
+                break
+        return p or "/"
 
     def do_GET(self) -> None:  # noqa: N802
         r = self._route()
@@ -137,7 +141,7 @@ class handler(BaseHTTPRequestHandler):
 
 
 CONSOLE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent Fleet</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent Multiverse</title>
 <style>
 :root{--bg:#f6f7f9;--card:#fff;--ink:#16181d;--muted:#5f6673;--line:#e3e6eb;--accent:#3b5bdb;--ok:#2b8a3e;--bad:#c92a2a}
 @media (prefers-color-scheme:dark){:root{--bg:#0f1115;--card:#171a21;--ink:#e8eaee;--muted:#9aa1ad;--line:#2a2f39;--accent:#748ffc;--ok:#69db7c;--bad:#ff8787}}
@@ -155,9 +159,9 @@ th{color:var(--muted);font-weight:500}.pill{font-size:12px;padding:1px 7px;borde
 .se{color:var(--bad);border-color:var(--bad)}section{margin-bottom:22px}.row{display:flex;gap:8px;flex-wrap:wrap}
 .scroll{overflow-x:auto}
 </style></head><body><main>
-<h1>Agent Fleet</h1><p class="sub" id="mode">Orchestrator → department managers → worker agents</p>
+<h1>Agent Multiverse</h1><p class="sub" id="mode">Orchestrator → department managers → worker agents</p>
 <div class="grid" id="kpis"></div>
-<section class="card"><b>Give the fleet a goal</b>
+<section class="card"><b>Give the multiverse a goal</b>
 <p class="l">Separate steps with “;” or “then”. Independent steps run in parallel across departments.</p>
 <textarea id="goal" rows="3">Calculate 1200*12*0.18; then summarize the result</textarea>
 <input id="token" type="password" placeholder="Access token (optional, enables Claude)" style="margin-top:8px">
@@ -170,23 +174,23 @@ const $=id=>document.getElementById(id);
 const hdr=()=>{const t=$('token').value.trim();return Object.assign({'Content-Type':'application/json'},t?{Authorization:'Bearer '+t}:{})};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 async function load(){
- const st=await (await fetch('/fleet/api/status',{headers:hdr()})).json();
+ const st=await (await fetch('/multiverse/api/status',{headers:hdr()})).json();
  $('mode').textContent='Mode: '+st.mode+' · backend '+st.llm+' · approvals '+st.approval_policy;
  $('kpis').innerHTML=[[st.workers.toLocaleString(),'worker agents'],[st.managers.length,'managers'],[st.skills,'skills'],[1,'orchestrator']]
   .map(([k,l])=>`<div class="card"><div class="k">${k}</div><div class="l">${l}</div></div>`).join('');
  $('mgrs').innerHTML='<tr><th>Manager</th><th>Department</th><th>Workers</th><th>Skills</th></tr>'+st.managers.map(m=>
   `<tr><td>${esc(m.manager)}</td><td>${esc(m.department)}</td><td>${m.workers}</td><td>${m.skills.map(esc).join(', ')}</td></tr>`).join('');
- const sk=await (await fetch('/fleet/api/skills',{headers:hdr()})).json();
+ const sk=await (await fetch('/multiverse/api/skills',{headers:hdr()})).json();
  $('skills').innerHTML='<tr><th>Skill</th><th>Departments</th><th>What it does</th></tr>'+sk.map(s=>
   `<tr><td><code>${esc(s.name)}</code> ${s.side_effect?'<span class="pill se">needs approval</span>':''}</td><td>${s.departments.map(esc).join(', ')}</td><td>${esc(s.description)}</td></tr>`).join('');
 }
 $('run').onclick=async()=>{$('out').textContent='Running…';
- const r=await fetch('/fleet/api/run',{method:'POST',headers:hdr(),body:JSON.stringify({goal:$('goal').value})});
+ const r=await fetch('/multiverse/api/run',{method:'POST',headers:hdr(),body:JSON.stringify({goal:$('goal').value})});
  const d=await r.json(); if(d.error){$('out').textContent=d.error;return}
  $('out').textContent=(d.ok?'OK':'INCOMPLETE')+(d.from_playbook?' (learned playbook)':'')+'\\n\\n'+
   d.steps.map(s=>`${s.id} ${s.department}/${s.skill||'agent'} by ${s.worker||'-'}: ${s.ok?JSON.stringify(s.output):'✗ '+s.error}`).join('\\n')+'\\n\\n'+d.summary;};
 $('demo').onclick=async()=>{$('out').textContent='Dispatching 3,000 tasks…';
- const r=await fetch('/fleet/api/demo',{method:'POST',headers:hdr(),body:JSON.stringify({tasks:3000})});
+ const r=await fetch('/multiverse/api/demo',{method:'POST',headers:hdr(),body:JSON.stringify({tasks:3000})});
  $('out').textContent=JSON.stringify(await r.json(),null,2);};
 $('token').onchange=load; load();
 </script></body></html>"""

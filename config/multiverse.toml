@@ -1,12 +1,12 @@
-# Agent Fleet configuration. Edit and re-run; no code changes needed.
+# Agent Multiverse configuration. Edit and re-run; no code changes needed.
 
-[fleet]
+[multiverse]
 llm = "auto"                 # auto (Claude if ANTHROPIC_API_KEY / `ant auth login` present, else offline) | claude | offline
 model = "claude-opus-5-5"    # worker model
 planner_model = "claude-opus-5-5"
 effort = "medium"            # worker effort: low | medium | high | xhigh | max  (planner always runs at high)
-max_concurrency = 16         # concurrent Claude requests across the whole fleet (protects your rate limit)
-workspace = ".fleet"         # files, outbox, calendar.ics, notes.json, fleet.db live here
+max_concurrency = 16         # concurrent Claude requests across the whole multiverse (protects your rate limit)
+workspace = ".multiverse"         # files, outbox, calendar.ics, notes.json, multiverse.db live here
 approval_policy = "ask"      # ask: side-effect skills wait for `approve`; auto: run them; deny: never
 auto_approve = ["webhook.notify"]   # side-effect skills that never need a human
 skill_dirs = ["skills_contrib"]     # drop *.py files with @skill functions here to add skills
@@ -42,7 +42,7 @@ manager = "Data Manager"
 description = "CSV/JSON crunching, statistics, conversions."
 workers = 150
 
-# Recurring jobs run by `python -m agent_fleet serve`.
+# Recurring jobs run by `python -m agent_multiverse serve`.
 [[schedule]]
 name = "morning-brief"
 goal = "List my calendar events; then summarize today's todo list notes"

@@ -1,4 +1,4 @@
-"""Agent Fleet: orchestrator -> managers -> hundreds/thousands of worker agents.
+"""Agent Multiverse: orchestrator -> managers -> hundreds/thousands of worker agents.
 
 Layers
 ------
@@ -11,7 +11,7 @@ Scheduler     recurring jobs (every N minutes / daily at HH:MM / weekdays)
 """
 from .models import Task, TaskStatus, TaskResult
 from .skills import Skill, SkillRegistry, skill
-from .fleet import Fleet, build_fleet
+from .multiverse import Multiverse, build_multiverse
 
-__all__ = ["Task", "TaskStatus", "TaskResult", "Skill", "SkillRegistry", "skill", "Fleet", "build_fleet"]
+__all__ = ["Task", "TaskStatus", "TaskResult", "Skill", "SkillRegistry", "skill", "Multiverse", "build_multiverse"]
 __version__ = "0.1.0"

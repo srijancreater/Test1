@@ -5,12 +5,12 @@ from types import SimpleNamespace
 
 import pytest
 
-from agent_fleet import Task, build_fleet
-from agent_fleet.fleet import playbook_key
-from agent_fleet.llm import ClaudeBackend
-from agent_fleet.models import TaskStatus
-from agent_fleet.scheduler import Job
-from agent_fleet.skills import Skill
+from agent_multiverse import Task, build_multiverse
+from agent_multiverse.multiverse import playbook_key
+from agent_multiverse.llm import ClaudeBackend
+from agent_multiverse.models import TaskStatus
+from agent_multiverse.scheduler import Job
+from agent_multiverse.skills import Skill
 
 DEPTS = [{"name": n, "workers": w} for n, w in
          [("research", 5), ("comms", 5), ("ops", 5), ("finance", 3), ("data", 3)]]
@@ -18,8 +18,8 @@ DEPTS = [{"name": n, "workers": w} for n, w in
 
 @pytest.fixture
 def fleet(tmp_path):
-    cfg = {"fleet": {"llm": "offline", "store": ":memory:", "approval_policy": "ask"}, "department": DEPTS}
-    return build_fleet(cfg, workspace=tmp_path)
+    cfg = {"multiverse": {"llm": "offline", "store": ":memory:", "approval_policy": "ask"}, "department": DEPTS}
+    return build_multiverse(cfg, workspace=tmp_path)
 
 
 def run(coro):
@@ -39,9 +39,9 @@ def test_direct_skill(fleet):
 
 
 def test_thousand_agents_bulk(tmp_path):
-    cfg = {"fleet": {"llm": "offline", "store": ":memory:"},
+    cfg = {"multiverse": {"llm": "offline", "store": ":memory:"},
            "department": [{"name": "finance", "workers": 600}, {"name": "data", "workers": 600}]}
-    f = build_fleet(cfg, workspace=tmp_path)
+    f = build_multiverse(cfg, workspace=tmp_path)
     assert f.worker_count == 1200
     res = run(f.submit_many([Task(goal="c", skill="calculate", args={"expression": f"{i}+1"}) for i in range(3000)]))
     assert all(r.ok for r in res)

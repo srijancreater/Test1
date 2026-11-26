@@ -8,19 +8,27 @@
       "includeFiles": "{tender_radar,config,data}/**",
       "maxDuration": 30
     },
-    "api/fleet.py": {
-      "includeFiles": "{agent_fleet,config,skills_contrib}/**",
+    "api/multiverse.py": {
+      "includeFiles": "{agent_multiverse,config,skills_contrib}/**",
       "maxDuration": 60
     }
   },
   "rewrites": [
     {
+      "source": "/multiverse",
+      "destination": "/api/multiverse"
+    },
+    {
+      "source": "/multiverse/(.*)",
+      "destination": "/api/multiverse"
+    },
+    {
       "source": "/fleet",
-      "destination": "/api/fleet"
+      "destination": "/api/multiverse"
     },
     {
       "source": "/fleet/(.*)",
-      "destination": "/api/fleet"
+      "destination": "/api/multiverse"
     },
     {
       "source": "/(.*)",

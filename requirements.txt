@@ -1,3 +1,3 @@
 # Tender Radar has no third-party runtime dependencies (stdlib only).
-# Agent Fleet uses the Anthropic SDK when ANTHROPIC_API_KEY + FLEET_ACCESS_TOKEN are set (offline otherwise).
+# Agent Multiverse uses the Anthropic SDK when ANTHROPIC_API_KEY + MULTIVERSE_ACCESS_TOKEN are set (offline otherwise).
 anthropic>=2.14

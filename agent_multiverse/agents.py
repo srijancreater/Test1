@@ -15,7 +15,7 @@ from .skills import Skill, SkillContext
 
 @dataclass
 class Worker:
-    """One agent. Cheap to create (a few hundred bytes) so a fleet can hold thousands."""
+    """One agent. Cheap to create (a few hundred bytes) so a multiverse can hold thousands."""
 
     id: str
     department: str

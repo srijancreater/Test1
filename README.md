@@ -1,25 +1,25 @@
-# Agent Fleet: orchestrator, managers, thousands of agents
+# Agent Multiverse: orchestrator, managers, thousands of agents
 
-`agent_fleet/` is a self-hosted multi-agent system for everyday tasks. One **orchestrator** plans
+`agent_multiverse/` is a self-hosted multi-agent system for everyday tasks. One **orchestrator** plans
 goals and routes the work. A **manager** per department (research, comms, ops, finance, data) runs
 a pool of **workers**: 1,000 by default, scalable to 10,000+. Workers use **skills** (drop a
 `.py` file into `skills_contrib/`) and **connectors** (files, HTTP, email/SMTP, Slack/Teams/Zapier
 webhooks, calendar, shared notes). Repeated goals are learned as playbooks. Recurring jobs run on a
-schedule. Side effects wait for your approval. Full design: [docs/agent-fleet.md](docs/agent-fleet.md).
+schedule. Side effects wait for your approval. Full design: [docs/agent-multiverse.md](docs/agent-multiverse.md).
 
 ```bash
 pip install -e ".[claude]"                 # Claude backend (optional; offline mode works without it)
 export ANTHROPIC_API_KEY=...               # or `ant auth login`
 
-python -m agent_fleet status               # departments, managers, workers, task counts
-python -m agent_fleet skills               # every skill and which departments have it
-python -m agent_fleet run "Read files/inbox.txt and extract action items; then save them as a note"
-python -m agent_fleet run "Calculate 1200*12*0.18; then send email to sam@example.com with the tax estimate"
-python -m agent_fleet approvals            # side-effect calls waiting for you
-python -m agent_fleet approve t_ab12cd34ef
-python -m agent_fleet bulk tasks.jsonl     # thousands of tasks, one JSON per line
-python -m agent_fleet serve                # run [[schedule]] jobs from config/fleet.toml
-python -m agent_fleet demo --tasks 5000    # offline stress test across 1,000 workers
+python -m agent_multiverse status               # departments, managers, workers, task counts
+python -m agent_multiverse skills               # every skill and which departments have it
+python -m agent_multiverse run "Read files/inbox.txt and extract action items; then save them as a note"
+python -m agent_multiverse run "Calculate 1200*12*0.18; then send email to sam@example.com with the tax estimate"
+python -m agent_multiverse approvals            # side-effect calls waiting for you
+python -m agent_multiverse approve t_ab12cd34ef
+python -m agent_multiverse bulk tasks.jsonl     # thousands of tasks, one JSON per line
+python -m agent_multiverse serve                # run [[schedule]] jobs from config/multiverse.toml
+python -m agent_multiverse demo --tasks 5000    # offline stress test across 1,000 workers
 ```
 
 ---

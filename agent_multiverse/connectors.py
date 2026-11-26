@@ -55,7 +55,7 @@ def _safe_path(root: Path, rel: str) -> Path:
 
 class FilesConnector(Connector):
     name = "files"
-    description = "Read/write files inside the fleet workspace (sandboxed)."
+    description = "Read/write files inside the multiverse workspace (sandboxed)."
 
     @property
     def live(self) -> bool:
@@ -88,31 +88,31 @@ class FilesConnector(Connector):
 
 class HttpConnector(Connector):
     name = "http"
-    description = "Fetch web pages / call JSON APIs. Optional allowlist: FLEET_HTTP_ALLOW=host1,host2"
+    description = "Fetch web pages / call JSON APIs. Optional allowlist: MULTIVERSE_HTTP_ALLOW=host1,host2"
 
     @property
     def live(self) -> bool:
         return True
 
     def _check(self, url: str) -> None:
-        allow = [h.strip() for h in os.environ.get("FLEET_HTTP_ALLOW", "").split(",") if h.strip()]
+        allow = [h.strip() for h in os.environ.get("MULTIVERSE_HTTP_ALLOW", "").split(",") if h.strip()]
         host = urllib.parse.urlparse(url).hostname or ""
         if urllib.parse.urlparse(url).scheme not in ("http", "https"):
             raise ValueError("only http(s) URLs are allowed")
         if allow and not any(host == a or host.endswith("." + a) for a in allow):
-            raise PermissionError(f"host {host} not in FLEET_HTTP_ALLOW")
+            raise PermissionError(f"host {host} not in MULTIVERSE_HTTP_ALLOW")
 
     def actions(self) -> list[Skill]:
         def get(url: str, max_chars: int = 20000) -> str:
             self._check(url)
-            req = urllib.request.Request(url, headers={"User-Agent": "agent-fleet/0.1"})
+            req = urllib.request.Request(url, headers={"User-Agent": "agent-multiverse/0.1"})
             with urllib.request.urlopen(req, timeout=20) as r:  # noqa: S310 - scheme checked
                 return r.read(max_chars * 4).decode("utf-8", "replace")[:max_chars]
 
         def post_json(url: str, payload: dict) -> str:
             self._check(url)
             req = urllib.request.Request(url, data=json.dumps(payload).encode(), method="POST",
-                                         headers={"Content-Type": "application/json", "User-Agent": "agent-fleet/0.1"})
+                                         headers={"Content-Type": "application/json", "User-Agent": "agent-multiverse/0.1"})
             with urllib.request.urlopen(req, timeout=20) as r:  # noqa: S310
                 return r.read(20000).decode("utf-8", "replace")
 
@@ -128,7 +128,7 @@ class HttpConnector(Connector):
 class EmailConnector(Connector):
     name = "email"
     description = "Send email via SMTP. Without credentials, messages are written to workspace/outbox/."
-    env_vars = ("FLEET_SMTP_HOST", "FLEET_SMTP_USER", "FLEET_SMTP_PASSWORD")
+    env_vars = ("MULTIVERSE_SMTP_HOST", "MULTIVERSE_SMTP_USER", "MULTIVERSE_SMTP_PASSWORD")
 
     def actions(self) -> list[Skill]:
         def send(to: str, subject: str, body: str) -> str:
@@ -139,13 +139,13 @@ class EmailConnector(Connector):
                 f.write_text(f"To: {to}\nSubject: {subject}\n\n{body}\n", encoding="utf-8")
                 return f"[dry-run] saved to {f.name}"
             msg = EmailMessage()
-            msg["From"] = os.environ.get("FLEET_SMTP_FROM", os.environ["FLEET_SMTP_USER"])
+            msg["From"] = os.environ.get("MULTIVERSE_SMTP_FROM", os.environ["MULTIVERSE_SMTP_USER"])
             msg["To"], msg["Subject"] = to, subject
             msg.set_content(body)
-            port = int(os.environ.get("FLEET_SMTP_PORT", "587"))
-            with smtplib.SMTP(os.environ["FLEET_SMTP_HOST"], port, timeout=30) as s:
+            port = int(os.environ.get("MULTIVERSE_SMTP_PORT", "587"))
+            with smtplib.SMTP(os.environ["MULTIVERSE_SMTP_HOST"], port, timeout=30) as s:
                 s.starttls(context=ssl.create_default_context())
-                s.login(os.environ["FLEET_SMTP_USER"], os.environ["FLEET_SMTP_PASSWORD"])
+                s.login(os.environ["MULTIVERSE_SMTP_USER"], os.environ["MULTIVERSE_SMTP_PASSWORD"])
                 s.send_message(msg)
             return f"sent to {to}"
 
@@ -156,8 +156,8 @@ class EmailConnector(Connector):
 
 class WebhookConnector(Connector):
     name = "webhook"
-    description = "Post a message to Slack/Teams/Discord/Zapier incoming webhook (FLEET_WEBHOOK_URL)."
-    env_vars = ("FLEET_WEBHOOK_URL",)
+    description = "Post a message to Slack/Teams/Discord/Zapier incoming webhook (MULTIVERSE_WEBHOOK_URL)."
+    env_vars = ("MULTIVERSE_WEBHOOK_URL",)
 
     def actions(self) -> list[Skill]:
         def notify(text: str) -> str:
@@ -167,7 +167,7 @@ class WebhookConnector(Connector):
                 with (out / "webhook.log").open("a", encoding="utf-8") as f:
                     f.write(f"{dt.datetime.now().isoformat()} {text}\n")
                 return "[dry-run] appended to outbox/webhook.log"
-            req = urllib.request.Request(os.environ["FLEET_WEBHOOK_URL"], data=json.dumps({"text": text}).encode(),
+            req = urllib.request.Request(os.environ["MULTIVERSE_WEBHOOK_URL"], data=json.dumps({"text": text}).encode(),
                                          method="POST", headers={"Content-Type": "application/json"})
             with urllib.request.urlopen(req, timeout=20) as r:  # noqa: S310
                 return f"posted ({r.status})"
@@ -191,8 +191,8 @@ class CalendarConnector(Connector):
             t0 = dt.datetime.fromisoformat(start)
             t1 = t0 + dt.timedelta(minutes=minutes)
             fmt = "%Y%m%dT%H%M%S"
-            body = ics.read_text(encoding="utf-8") if ics.exists() else "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//agent-fleet//EN\nEND:VCALENDAR\n"
-            uid = f"{t0:%Y%m%d%H%M%S}-{abs(hash(title)) % 10**8}@agent-fleet"
+            body = ics.read_text(encoding="utf-8") if ics.exists() else "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//agent-multiverse//EN\nEND:VCALENDAR\n"
+            uid = f"{t0:%Y%m%d%H%M%S}-{abs(hash(title)) % 10**8}@agent-multiverse"
             ev = (f"BEGIN:VEVENT\nUID:{uid}\nDTSTART:{t0:{fmt}}\nDTEND:{t1:{fmt}}\n"
                   f"SUMMARY:{title}\nDESCRIPTION:{notes}\nEND:VEVENT\n")
             ics.write_text(body.replace("END:VCALENDAR", ev + "END:VCALENDAR"), encoding="utf-8")

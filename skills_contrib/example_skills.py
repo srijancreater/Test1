@@ -3,7 +3,7 @@
 A skill is just a function with type hints and a docstring. Tag it with the department(s)
 that should get it; tag `side_effect` if it changes the outside world (then it needs approval).
 """
-from agent_fleet import skill
+from agent_multiverse import skill
 
 
 @skill(tags={"department:ops"})

@@ -1,4 +1,4 @@
-# Agent Fleet: design and operating guide
+# Agent Multiverse: design and operating guide
 
 One orchestrator, a manager per department, and hundreds to thousands of worker agents that do
 everyday tasks. Workers can only use the skills assigned to them. They handle one-off jobs, repeated
@@ -6,7 +6,7 @@ jobs and multi-step jobs.
 
 ```
                          ┌──────────────────────────────────────────┐
-  you / scheduler ──────▶│ ORCHESTRATOR (Fleet)                     │
+  you / scheduler ──────▶│ ORCHESTRATOR (Multiverse)                     │
   CLI / bulk file        │  1. recall a learned playbook, or plan   │  Claude planner (effort=high,
                          │  2. split into a DAG of steps            │  JSON-schema output)
                          │  3. route each step to a department      │
@@ -43,10 +43,10 @@ jobs and multi-step jobs.
 | Finance Manager | 1 → 100 workers | Budgets, expenses, bill splitting, calculations. |
 | Data Manager | 1 → 150 workers | CSV/JSON stats and conversions. |
 
-You change counts, departments and managers in `config/fleet.toml`, with no code changes. Use
-`--scale 0.01` for a tiny fleet or `--scale 10` for 10,000 workers. A worker is a small Python
+You change counts, departments and managers in `config/multiverse.toml`, with no code changes. Use
+`--scale 0.01` for a tiny multiverse or `--scale 10` for 10,000 workers. A worker is a small Python
 object, so the pool size is cheap. The real limit is `max_concurrency`, the number of concurrent
-Claude requests shared by the whole fleet.
+Claude requests shared by the whole multiverse.
 
 ## What kind of work
 
@@ -67,16 +67,16 @@ Claude requests shared by the whole fleet.
   and `approve ID` runs exactly that call. Set `auto_approve` to trust specific skills; `deny`
   disables side effects entirely.
 * Workers can only call skills assigned to their department.
-* The files connector is sandboxed to the workspace. `FLEET_HTTP_ALLOW` restricts HTTP hosts.
+* The files connector is sandboxed to the workspace. `MULTIVERSE_HTTP_ALLOW` restricts HTTP hosts.
 * Every skill call, error, escalation, plan and approval goes to the `audit` log.
-* Email and webhook run in **dry-run mode** (writing to `.fleet/outbox/`) until credentials are set.
+* Email and webhook run in **dry-run mode** (writing to `.multiverse/outbox/`) until credentials are set.
 
 ## Adding skills
 
 Drop a file in `skills_contrib/`:
 
 ```python
-from agent_fleet import skill
+from agent_multiverse import skill
 
 @skill(tags={"department:ops"})
 def plan_my_day(tasks: str, start_hour: int = 9) -> list[str]:
@@ -96,9 +96,9 @@ Each action becomes the skill `<connector>.<action>`.
 
 | Connector | Live when set | Otherwise |
 |---|---|---|
-| email | `FLEET_SMTP_HOST`, `FLEET_SMTP_USER`, `FLEET_SMTP_PASSWORD` (+ `FLEET_SMTP_PORT`, `FLEET_SMTP_FROM`) | `.eml` files in `.fleet/outbox/` |
-| webhook | `FLEET_WEBHOOK_URL` (Slack/Teams/Discord/Zapier incoming webhook) | `.fleet/outbox/webhook.log` |
-| http | always (optional `FLEET_HTTP_ALLOW` allowlist) | |
+| email | `MULTIVERSE_SMTP_HOST`, `MULTIVERSE_SMTP_USER`, `MULTIVERSE_SMTP_PASSWORD` (+ `MULTIVERSE_SMTP_PORT`, `MULTIVERSE_SMTP_FROM`) | `.eml` files in `.multiverse/outbox/` |
+| webhook | `MULTIVERSE_WEBHOOK_URL` (Slack/Teams/Discord/Zapier incoming webhook) | `.multiverse/outbox/webhook.log` |
+| http | always (optional `MULTIVERSE_HTTP_ALLOW` allowlist) | |
 | files, calendar, notes | always (local workspace) | |
 
 Through a Zapier or Make webhook, `webhook.notify` / `http.post_json` can reach thousands of SaaS
@@ -108,7 +108,7 @@ apps without writing a connector for each.
 
 * `llm = "auto"` uses Claude when credentials exist (`ANTHROPIC_API_KEY` or `ant auth login`).
   Otherwise it falls back to the deterministic **offline** backend: keyword planning plus direct
-  skill calls. That keeps the fleet, the tests and CI runnable without a key.
+  skill calls. That keeps the multiverse, the tests and CI runnable without a key.
 * Workers run a Messages-API tool loop on `claude-opus-5-5` at `effort = "medium"`. Parallel tool
   calls are executed at the same time and returned in one message. Tool errors go back to the
   model as `is_error` results.

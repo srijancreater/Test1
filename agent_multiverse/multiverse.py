@@ -1,4 +1,4 @@
-"""The Orchestrator ("Fleet"): intake -> plan (or recall a learned playbook) -> route to managers ->
+"""The Orchestrator ("Multiverse"): intake -> plan (or recall a learned playbook) -> route to managers ->
 run the DAG with maximum parallelism -> approvals -> aggregate -> learn."""
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from .skills import SkillRegistry
 from .store import Store
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_CONFIG = ROOT / "config" / "fleet.toml"
+DEFAULT_CONFIG = ROOT / "config" / "multiverse.toml"
 
 
 @dataclass
@@ -44,7 +44,7 @@ def playbook_key(goal: str) -> str:
     return re.sub(r"\s+", " ", re.sub(r"[^\w#<> ]", " ", g)).strip()
 
 
-class Fleet:
+class Multiverse:
     def __init__(self, llm: LLMBackend, workspace: Path, store: Store, approval_policy: str = "ask",
                  auto_approve: list[str] | None = None) -> None:
         self.llm = llm
@@ -215,12 +215,12 @@ def load_config(path: str | Path | None = None) -> dict[str, Any]:
     return tomllib.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
 
 
-def build_fleet(config: str | Path | dict[str, Any] | None = None, *, llm: str | LLMBackend | None = None,
+def build_multiverse(config: str | Path | dict[str, Any] | None = None, *, llm: str | LLMBackend | None = None,
                 workspace: str | Path | None = None, scale: float = 1.0, approval_policy: str | None = None,
-                exclude_skills: list[str] | None = None) -> Fleet:
+                exclude_skills: list[str] | None = None) -> Multiverse:
     cfg = config if isinstance(config, dict) else load_config(config)
-    fc = cfg.get("fleet", {})
-    ws = Path(workspace or fc.get("workspace", ROOT / ".fleet")).resolve()
+    fc = cfg.get("multiverse") or cfg.get("fleet", {})  # [fleet] accepted for old configs
+    ws = Path(workspace or fc.get("workspace", ROOT / ".multiverse")).resolve()
     ws.mkdir(parents=True, exist_ok=True)
     if isinstance(llm, str) or llm is None:
         kind = llm or fc.get("llm", "auto")
@@ -228,7 +228,7 @@ def build_fleet(config: str | Path | dict[str, Any] | None = None, *, llm: str |
                                         if kind != "offline" else {}))
     else:
         backend = llm
-    fleet = Fleet(backend, ws, Store(":memory:" if fc.get("store") == ":memory:" else ws / "fleet.db"),
+    fleet = Multiverse(backend, ws, Store(":memory:" if fc.get("store") == ":memory:" else ws / "multiverse.db"),
                   approval_policy=approval_policy or fc.get("approval_policy", "ask"),
                   auto_approve=fc.get("auto_approve", []))
     fleet.skills.load_module_skills(builtin_skills)

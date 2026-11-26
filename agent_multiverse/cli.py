@@ -1,4 +1,4 @@
-"""agent-fleet command line.
+"""agent-multiverse command line.
 
   run "goal"                 plan + execute a (complex) goal across departments
   do SKILL --args JSON       run one skill directly
@@ -6,7 +6,7 @@
   approvals | approve ID | reject ID
   status | history | skills | connectors | playbooks | forget KEY | audit
   serve                      run scheduled jobs from config
-  demo --tasks N             stress test: N everyday tasks across the whole fleet (offline)
+  demo --tasks N             stress test: N everyday tasks across the whole multiverse (offline)
 """
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ import random
 import sys
 import time
 
-from .fleet import build_fleet, load_config
+from .multiverse import build_multiverse, load_config
 from .models import Task
 from .scheduler import jobs_from_config, serve
 
@@ -27,10 +27,10 @@ def _p(obj) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(prog="agent-fleet", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--config", help="path to fleet.toml (default config/fleet.toml)")
+    ap = argparse.ArgumentParser(prog="agent-multiverse", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--config", help="path to multiverse.toml (default config/multiverse.toml)")
     ap.add_argument("--llm", choices=["auto", "claude", "offline"])
-    ap.add_argument("--scale", type=float, default=1.0, help="multiply worker counts (0.01 for a tiny fleet)")
+    ap.add_argument("--scale", type=float, default=1.0, help="multiply worker counts (0.01 for a tiny multiverse)")
     ap.add_argument("--approve-all", action="store_true", help="auto-approve side-effect skills for this command")
     sub = ap.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("run"); r.add_argument("goal"); r.add_argument("--no-memory", action="store_true"); r.add_argument("--json", action="store_true")
@@ -46,7 +46,7 @@ def main(argv: list[str] | None = None) -> int:
 
     cfg = load_config(a.config)
     llm = "offline" if a.cmd == "demo" else a.llm
-    fleet = build_fleet(cfg, llm=llm, scale=a.scale, approval_policy="auto" if a.approve_all else None)
+    fleet = build_multiverse(cfg, llm=llm, scale=a.scale, approval_policy="auto" if a.approve_all else None)
 
     if a.cmd == "run":
         rep = asyncio.run(fleet.run(a.goal, use_memory=not a.no_memory))
@@ -60,7 +60,7 @@ def main(argv: list[str] | None = None) -> int:
                       f"{'ok' if st['ok'] else st['error']}")
             print("\n" + rep.summary)
             for tid in rep.waiting_approval:
-                print(f"\n  waiting for approval: {tid}   ->  python -m agent_fleet approve {tid}")
+                print(f"\n  waiting for approval: {tid}   ->  python -m agent_multiverse approve {tid}")
         return 0 if rep.ok or rep.waiting_approval else 1
     if a.cmd == "do":
         res = asyncio.run(fleet.submit(Task(goal=f"run {a.skill}", skill=a.skill, args=json.loads(a.args))))
@@ -126,7 +126,7 @@ def _demo(fleet, n: int) -> int:
         lambda i: Task(goal=f"Summarize: The team shipped release {i}. Customers liked the faster search. Next: billing fixes."),
     ]
     tasks = [makers[i % len(makers)](i) for i in range(n)]
-    print(f"fleet: {fleet.worker_count} workers in {len(fleet.managers)} departments, {len(fleet.skills)} skills")
+    print(f"multiverse: {fleet.worker_count} workers in {len(fleet.managers)} departments, {len(fleet.skills)} skills")
     t0 = time.perf_counter()
     res = asyncio.run(fleet.submit_many(tasks))
     dt_s = time.perf_counter() - t0

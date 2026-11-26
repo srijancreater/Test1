@@ -17,8 +17,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: pip install pytest
       - run: python -m pytest -q
-      - name: Agent fleet stress test (offline, 1000 workers)
-        run: python -m agent_fleet demo --tasks 2000
+      - name: Agent Multiverse stress test (offline, 1000 workers)
+        run: python -m agent_multiverse demo --tasks 2000
       - name: Build sample dashboard
         run: python -m tender_radar scan data/sample_tenders.csv --html out/index.html --csv out/tenders.csv
       - uses: actions/upload-artifact@v4

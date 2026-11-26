@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "tender-radar"
 version = "0.1.0"
-description = "Tender Radar + Agent Fleet (orchestrator, managers, thousands of worker agents)"
+description = "Tender Radar + Agent Multiverse (orchestrator, managers, thousands of worker agents)"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = []
@@ -16,10 +16,10 @@ claude = ["anthropic>=2.14"]
 
 [project.scripts]
 tender-radar = "tender_radar.cli:main"
-agent-fleet = "agent_fleet.cli:main"
+agent-multiverse = "agent_multiverse.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["tender_radar*", "agent_fleet*"]
+include = ["tender_radar*", "agent_multiverse*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

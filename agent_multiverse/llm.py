@@ -2,7 +2,7 @@
 
 ClaudeBackend  - uses the Anthropic SDK (Messages API, manual tool loop) when credentials exist.
 OfflineBackend - deterministic, no network: keyword planning + direct skill calls. Lets the whole
-                 fleet run (and be tested) without an API key; swap in Claude by setting ANTHROPIC_API_KEY.
+                 multiverse run (and be tested) without an API key; swap in Claude by setting ANTHROPIC_API_KEY.
 """
 from __future__ import annotations
 

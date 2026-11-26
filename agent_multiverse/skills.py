@@ -48,7 +48,7 @@ class Skill:
 
 @dataclass
 class SkillContext:
-    """Passed to handlers that accept `ctx`: access to the fleet's connectors, memory and workspace."""
+    """Passed to handlers that accept `ctx`: access to the multiverse's connectors, memory and workspace."""
 
     fleet: Any
     task: Any
@@ -150,7 +150,7 @@ class SkillRegistry:
         for f in sorted(path.glob("*.py")):
             if f.name.startswith("_"):
                 continue
-            spec = importlib.util.spec_from_file_location(f"fleet_plugin_{f.stem}", f)
+            spec = importlib.util.spec_from_file_location(f"multiverse_plugin_{f.stem}", f)
             if not spec or not spec.loader:
                 continue
             mod = importlib.util.module_from_spec(spec)
