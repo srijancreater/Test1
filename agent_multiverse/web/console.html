@@ -10,38 +10,34 @@
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Unbounded:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --void:#0d0a24; --void-2:#171142; --violet:#6b4cff; --teal:#2de2c8; --coral:#ff7a90;
-  --star:#eef0ff; --mist:rgba(226,230,255,.66); --faint:rgba(226,230,255,.38);
-  --glass:rgba(255,255,255,.065); --glass-hi:rgba(255,255,255,.11); --edge:rgba(255,255,255,.14);
-  --research:#2de2c8; --comms:#ff7aa8; --ops:#ffc861; --finance:#8cf5a2; --data:#69b7ff;
+  --void:#14122b; --void-2:#ffffff; --violet:#5b3df5; --teal:#0f9e8a; --coral:#d6336c;
+  --star:#14122b; --mist:rgba(20,18,43,.68); --faint:rgba(20,18,43,.42);
+  --glass:#ffffff; --glass-hi:#f2f2f8; --edge:rgba(20,18,43,.11);
+  --research:#0f9e8a; --comms:#d6336c; --ops:#b86e00; --finance:#2b8a3e; --data:#1c6fd6;
   --r-lg:28px; --r-md:18px; --r-sm:12px;
   --display:"Unbounded",system-ui,sans-serif; --body:"Figtree",system-ui,sans-serif;
 }
 *{box-sizing:border-box}
-html{background:var(--void)}
+html{background:#fff}
 body{margin:0;min-height:100vh;color:var(--star);font:16px/1.55 var(--body);-webkit-font-smoothing:antialiased}
-body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
-    radial-gradient(900px 600px at 12% -10%,rgba(107,76,255,.55),transparent 60%),
-    radial-gradient(700px 520px at 95% 8%,rgba(45,226,200,.28),transparent 60%),
-    radial-gradient(900px 700px at 70% 110%,rgba(255,122,144,.22),transparent 60%),
-    linear-gradient(180deg,var(--void-2),var(--void) 70%)}
+body{background:#fff}
 .wrap{max-width:1240px;margin:0 auto;padding:20px 16px 72px}
 .glass{background:var(--glass);border:1px solid var(--edge);border-radius:var(--r-lg);
   backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 30px 60px -30px rgba(5,3,20,.8)}
+  box-shadow:0 1px 2px rgba(20,18,43,.04),0 18px 40px -24px rgba(20,18,43,.18)}
 button,input,textarea{font:inherit;color:inherit}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+:focus-visible{outline:2px solid var(--violet);outline-offset:3px}
 
 /* top bar */
 .bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 12px 10px 16px;border-radius:999px;margin-bottom:18px}
 .brand{display:flex;align-items:center;gap:10px;font:600 15px var(--display);letter-spacing:.01em;margin-right:auto}
 .brand svg{flex:none}
-.mode{font-size:13px;color:var(--mist);padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--edge)}
+.mode{font-size:13px;color:var(--mist);padding:6px 12px;border-radius:999px;background:var(--glass-hi);border:1px solid var(--edge)}
 .mode b{font-weight:600;color:var(--star)}
 .mode.live b{color:var(--teal)}
 .token{display:flex;align-items:center;gap:8px}
-.token input{width:220px;max-width:52vw;background:rgba(5,3,20,.35);border:1px solid var(--edge);border-radius:999px;padding:8px 14px;font-size:14px}
+.token input{width:220px;max-width:52vw;background:#f7f7fb;border:1px solid var(--edge);border-radius:999px;padding:8px 14px;font-size:14px}
 .token input::placeholder{color:var(--faint)}
 
 /* hero */
@@ -60,17 +56,17 @@ button,input,textarea{font:inherit;color:inherit}
 .panel{padding:26px}
 .panel h2{font:600 19px/1.25 var(--display);margin:0 0 6px}
 .panel .hint{color:var(--mist);margin:0 0 16px;font-size:15px}
-textarea{width:100%;min-height:128px;resize:vertical;background:rgba(5,3,20,.38);border:1px solid var(--edge);
+textarea{width:100%;min-height:128px;resize:vertical;background:#f7f7fb;border:1px solid var(--edge);
   border-radius:var(--r-md);padding:16px;font-size:16px;line-height:1.5}
 .ideas{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 18px}
-.idea{border:1px solid var(--edge);background:rgba(255,255,255,.05);border-radius:999px;padding:7px 13px;font-size:13.5px;color:var(--mist);cursor:pointer;transition:background .15s,color .15s}
+.idea{border:1px solid var(--edge);background:rgba(20,18,43,.04);border-radius:999px;padding:7px 13px;font-size:13.5px;color:var(--mist);cursor:pointer;transition:background .15s,color .15s}
 .idea:hover{background:var(--glass-hi);color:var(--star)}
 .actions{display:flex;gap:10px;flex-wrap:wrap}
 .btn{border:0;border-radius:999px;padding:12px 22px;font-weight:600;cursor:pointer;transition:transform .12s,filter .12s}
 .btn:active{transform:scale(.97)}
-.btn.primary{background:linear-gradient(120deg,var(--violet),#8e6bff 45%,var(--teal));color:#fff;box-shadow:0 10px 30px -10px rgba(107,76,255,.9)}
+.btn.primary{background:var(--violet);color:#fff;box-shadow:0 8px 20px -10px rgba(91,61,245,.7)}
 .btn.primary:hover{filter:brightness(1.1)}
-.btn.ghost{background:rgba(255,255,255,.07);border:1px solid var(--edge);color:var(--star)}
+.btn.ghost{background:var(--glass-hi);border:1px solid var(--edge);color:var(--star)}
 .btn.ghost:hover{background:var(--glass-hi)}
 .btn[disabled]{opacity:.55;cursor:progress}
 
@@ -79,26 +75,26 @@ textarea{width:100%;min-height:128px;resize:vertical;background:rgba(5,3,20,.38)
 .empty svg{opacity:.7;margin-bottom:12px}
 .status{display:flex;align-items:center;gap:10px;margin:0 0 16px;font-weight:600}
 .status .pill{font-size:12.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--edge)}
-.pill.ok{color:var(--finance);border-color:rgba(140,245,162,.45);background:rgba(140,245,162,.08)}
-.pill.wait{color:var(--ops);border-color:rgba(255,200,97,.45);background:rgba(255,200,97,.08)}
-.pill.bad{color:var(--coral);border-color:rgba(255,122,144,.45);background:rgba(255,122,144,.08)}
-.pill.memo{color:var(--data);border-color:rgba(105,183,255,.45);background:rgba(105,183,255,.08)}
+.pill.ok{color:var(--finance);border-color:rgba(43,138,62,.35);background:rgba(43,138,62,.07)}
+.pill.wait{color:var(--ops);border-color:rgba(184,110,0,.35);background:rgba(184,110,0,.07)}
+.pill.bad{color:var(--coral);border-color:rgba(214,51,108,.35);background:rgba(214,51,108,.07)}
+.pill.memo{color:var(--data);border-color:rgba(28,111,214,.35);background:rgba(28,111,214,.07)}
 ol.steps{list-style:none;margin:0;padding:0;position:relative}
 ol.steps::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--edge),transparent)}
 .step{position:relative;padding:0 0 18px 46px;animation:arrive .45s cubic-bezier(.2,.8,.2,1) both}
 .step .n{position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
-  font:600 13px var(--display);color:var(--void);background:var(--c,var(--teal));box-shadow:0 0 18px var(--c,var(--teal))}
+  font:600 13px var(--display);color:#fff;background:var(--c,var(--teal))}
 .step h3{margin:3px 0 2px;font-size:16px;font-weight:600}
 .step .who{color:var(--mist);font-size:13.5px}
 .step .who em{font-style:normal;color:var(--c)}
-.out{margin-top:8px;background:rgba(5,3,20,.4);border:1px solid var(--edge);border-radius:var(--r-sm);padding:10px 12px;
+.out{margin-top:8px;background:#f7f7fb;border:1px solid var(--edge);border-radius:var(--r-sm);padding:10px 12px;
   font-size:14px;white-space:pre-wrap;word-break:break-word;max-height:180px;overflow:auto}
-.out.err{border-color:rgba(255,122,144,.4);color:#ffc2cc}
-.summary{margin-top:6px;padding:16px;border-radius:var(--r-md);background:rgba(255,255,255,.05);border:1px solid var(--edge);white-space:pre-wrap;font-size:15px}
+.out.err{border-color:rgba(214,51,108,.35);color:#b42343}
+.summary{margin-top:6px;padding:16px;border-radius:var(--r-md);background:rgba(20,18,43,.04);border:1px solid var(--edge);white-space:pre-wrap;font-size:15px}
 .meter{display:grid;gap:10px;margin-top:6px}
 .meter .row{display:grid;grid-template-columns:150px 1fr 64px;gap:12px;align-items:center;font-size:14px}
-.meter .track{height:10px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
-.meter .fill{height:100%;border-radius:999px;background:var(--c);box-shadow:0 0 12px var(--c);transform-origin:left;animation:grow .9s cubic-bezier(.2,.8,.2,1) both}
+.meter .track{height:10px;border-radius:999px;background:rgba(20,18,43,.04);overflow:hidden}
+.meter .fill{height:100%;border-radius:999px;background:var(--c);transform-origin:left;animation:grow .9s cubic-bezier(.2,.8,.2,1) both}
 .meter .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--mist)}
 .bigstats{display:flex;gap:28px;flex-wrap:wrap;margin-bottom:18px}
 .bigstats strong{display:block;font:600 26px var(--display);font-variant-numeric:tabular-nums}
@@ -110,7 +106,7 @@ ol.steps::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width
 .section-head p{margin:0;color:var(--mist)}
 .depts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
 .dept{padding:20px;border-radius:var(--r-md);position:relative;overflow:hidden}
-.dept::after{content:"";position:absolute;width:140px;height:140px;right:-50px;top:-60px;border-radius:50%;background:var(--c);filter:blur(50px);opacity:.38}
+.dept::after{content:"";position:absolute;width:140px;height:140px;right:-50px;top:-60px;border-radius:50%;background:var(--c);filter:blur(50px);opacity:.14}
 .dept h3{font:600 15px var(--display);margin:0 0 2px;position:relative;overflow-wrap:anywhere}
 .dept .mgr{color:var(--mist);font-size:13.5px;margin:0 0 16px}
 .dept .count{font:800 34px/1 var(--display);color:var(--c);font-variant-numeric:tabular-nums}
@@ -120,18 +116,18 @@ ol.steps::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width
 /* skills */
 .lib{padding:8px}
 .lib-tools{display:flex;gap:10px;padding:12px 12px 4px;flex-wrap:wrap}
-.lib-tools input{flex:1 1 240px;background:rgba(5,3,20,.38);border:1px solid var(--edge);border-radius:999px;padding:10px 16px}
+.lib-tools input{flex:1 1 240px;background:#f7f7fb;border:1px solid var(--edge);border-radius:999px;padding:10px 16px}
 .lib-tools input::placeholder{color:var(--faint)}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip{border:1px solid var(--edge);border-radius:999px;padding:7px 12px;font-size:13px;background:transparent;color:var(--mist);cursor:pointer}
-.chip[aria-pressed="true"]{background:var(--c,rgba(255,255,255,.15));color:var(--void);border-color:transparent;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--c,var(--void));color:#fff;border-color:transparent;font-weight:600}
 .skill-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;padding:12px}
-.skill{padding:14px 16px;border-radius:var(--r-sm);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.skill{padding:14px 16px;border-radius:var(--r-sm);background:rgba(20,18,43,.04);border:1px solid var(--edge)}
 .skill code{font:600 14px var(--body);color:var(--star)}
 .skill p{margin:4px 0 10px;color:var(--mist);font-size:14px}
 .dots{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--c)}
-.gate{margin-left:auto;font-size:12px;color:var(--coral);border:1px solid rgba(255,122,144,.4);padding:2px 8px;border-radius:999px}
+.gate{margin-left:auto;font-size:12px;color:var(--coral);border:1px solid rgba(214,51,108,.35);padding:2px 8px;border-radius:999px}
 .foot{margin-top:34px;color:var(--faint);font-size:13.5px;text-align:center}
 .foot a{color:var(--mist)}
 
@@ -161,10 +157,10 @@ ol.steps::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width
   <header class="bar glass">
     <div class="brand">
       <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
-        <circle cx="15" cy="15" r="4.5" fill="#eef0ff"/>
-        <ellipse cx="15" cy="15" rx="13" ry="5.5" fill="none" stroke="#2de2c8" stroke-width="1.6" transform="rotate(-28 15 15)"/>
-        <ellipse cx="15" cy="15" rx="13" ry="5.5" fill="none" stroke="#6b4cff" stroke-width="1.6" transform="rotate(32 15 15)"/>
-        <circle cx="26" cy="9.5" r="2" fill="#ff7aa8"/>
+        <circle cx="15" cy="15" r="4.5" fill="#14122b"/>
+        <ellipse cx="15" cy="15" rx="13" ry="5.5" fill="none" stroke="#0f9e8a" stroke-width="1.6" transform="rotate(-28 15 15)"/>
+        <ellipse cx="15" cy="15" rx="13" ry="5.5" fill="none" stroke="#5b3df5" stroke-width="1.6" transform="rotate(32 15 15)"/>
+        <circle cx="26" cy="9.5" r="2" fill="#d6336c"/>
       </svg>
       <span>Agent Multiverse</span>
     </div>
@@ -205,7 +201,7 @@ ol.steps::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width
       <div id="out">
         <div class="empty">
           <div>
-            <svg width="54" height="54" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="6" fill="#6b4cff"/><circle cx="27" cy="27" r="16" fill="none" stroke="rgba(255,255,255,.25)" stroke-dasharray="3 5"/><circle cx="27" cy="27" r="25" fill="none" stroke="rgba(255,255,255,.12)" stroke-dasharray="2 6"/><circle cx="43" cy="27" r="3" fill="#2de2c8"/><circle cx="10" cy="20" r="2.5" fill="#ffc861"/></svg>
+            <svg width="54" height="54" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="6" fill="#5b3df5"/><circle cx="27" cy="27" r="16" fill="none" stroke="rgba(20,18,43,.22)" stroke-dasharray="3 5"/><circle cx="27" cy="27" r="25" fill="none" stroke="rgba(20,18,43,.12)" stroke-dasharray="2 6"/><circle cx="43" cy="27" r="3" fill="#0f9e8a"/><circle cx="10" cy="20" r="2.5" fill="#b86e00"/></svg>
             <p>Run a goal and each step shows up here: which department took it, which worker ran it, and what came back.</p>
           </div>
         </div>
@@ -238,7 +234,7 @@ ol.steps::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width
 <script>
 const $ = id => document.getElementById(id);
 const API = '/multiverse/api';
-const COLORS = {research:'#2de2c8', comms:'#ff7aa8', ops:'#ffc861', finance:'#8cf5a2', data:'#69b7ff'};
+const COLORS = {research:'#0f9e8a', comms:'#d6336c', ops:'#b86e00', finance:'#2b8a3e', data:'#1c6fd6'};
 const NAMES = {research:'Research', comms:'Communications', ops:'Operations', finance:'Finance', data:'Data'};
 const IDEAS = [
   'Read files/inbox.txt and extract action items; then save them as a note',
@@ -284,19 +280,19 @@ let stars = [];
 function draw(now) {
   const t = (now - t0) / 1000;
   ctx.clearRect(0, 0, W, H);
-  for (const s of stars) { ctx.fillStyle = `rgba(230,235,255,${0.15 + s.z * 0.35})`; ctx.fillRect(s.x, s.y, 1.2, 1.2); }
+  for (const s of stars) { ctx.fillStyle = `rgba(20,18,43,${0.08 + s.z * 0.18})`; ctx.fillRect(s.x, s.y, 1.2, 1.2); }
   if (!hubs.length) return;
   const {cx, cy} = hubs[0];
   const spin = reduce ? 0 : t * 0.04;
   const pos = hubs.map(h => [cx + Math.cos(h.a + spin) * h.r, cy + Math.sin(h.a + spin) * h.r * 0.78]);
   // orbit ring
-  ctx.strokeStyle = 'rgba(255,255,255,.08)'; ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(20,18,43,.1)'; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.ellipse(cx, cy, hubs[0].r, hubs[0].r * 0.78, 0, 0, Math.PI * 2); ctx.stroke();
   // beams orchestrator -> managers
   hubs.forEach((h, i) => {
     const f = flashes[h.dept] ? Math.max(0, 1 - (now - flashes[h.dept]) / 2200) : 0;
     const g = ctx.createLinearGradient(cx, cy, pos[i][0], pos[i][1]);
-    g.addColorStop(0, 'rgba(255,255,255,.35)'); g.addColorStop(1, h.c + (f > 0 ? 'ff' : '55'));
+    g.addColorStop(0, 'rgba(20,18,43,.25)'); g.addColorStop(1, h.c + (f > 0 ? 'ff' : '55'));
     ctx.strokeStyle = g; ctx.lineWidth = 1 + f * 2.5;
     ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(pos[i][0], pos[i][1]); ctx.stroke();
   });
@@ -316,19 +312,19 @@ function draw(now) {
   hubs.forEach((h, i) => {
     const [x, y] = pos[i];
     const glow = ctx.createRadialGradient(x, y, 0, x, y, 34);
-    glow.addColorStop(0, h.c + 'aa'); glow.addColorStop(1, h.c + '00');
+    glow.addColorStop(0, h.c + '55'); glow.addColorStop(1, h.c + '00');
     ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, 34, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = h.c; ctx.beginPath(); ctx.arc(x, y, 6.5, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = 'rgba(238,240,255,.85)'; ctx.font = '600 12px Figtree, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#14122b'; ctx.font = '600 12px Figtree, sans-serif'; ctx.textAlign = 'center';
     ctx.fillText(NAMES[h.dept] || h.dept, x, y + 26);
   });
   // orchestrator
   const pulse = reduce ? 0 : (Math.sin(t * 2) + 1) / 2;
   const og = ctx.createRadialGradient(cx, cy, 0, cx, cy, 60 + pulse * 10);
-  og.addColorStop(0, 'rgba(255,255,255,.9)'); og.addColorStop(.25, 'rgba(142,107,255,.6)'); og.addColorStop(1, 'rgba(107,76,255,0)');
+  og.addColorStop(0, 'rgba(91,61,245,.45)'); og.addColorStop(.3, 'rgba(91,61,245,.18)'); og.addColorStop(1, 'rgba(91,61,245,0)');
   ctx.fillStyle = og; ctx.beginPath(); ctx.arc(cx, cy, 70, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(cx, cy, 9, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = 'rgba(238,240,255,.9)'; ctx.font = '600 12px Figtree, sans-serif'; ctx.fillText('Orchestrator', cx, cy + 30);
+  ctx.fillStyle = '#5b3df5'; ctx.beginPath(); ctx.arc(cx, cy, 9, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#14122b'; ctx.font = '600 12px Figtree, sans-serif'; ctx.fillText('Orchestrator', cx, cy + 30);
 }
 function loop(now) { draw(now); if (!reduce || Object.keys(flashes).length) requestAnimationFrame(loop); }
 function flash(depts) { const now = performance.now(); depts.forEach(d => flashes[d] = now); if (reduce) requestAnimationFrame(loop); }
@@ -364,7 +360,7 @@ function renderDepts() {
 function renderFilters() {
   const ds = state.managers.map(m => m.department);
   $('filters').innerHTML = ['', ...ds].map(d =>
-    `<button class="chip" data-d="${d}" aria-pressed="${state.filter === d}" style="--c:${COLORS[d] || 'rgba(255,255,255,.85)'}">${d ? esc(NAMES[d] || d) : 'All'}</button>`).join('');
+    `<button class="chip" data-d="${d}" aria-pressed="${state.filter === d}" style="--c:${COLORS[d] || '#14122b'}">${d ? esc(NAMES[d] || d) : 'All'}</button>`).join('');
   $('filters').querySelectorAll('.chip').forEach(b => b.onclick = () => { state.filter = b.dataset.d; renderFilters(); renderSkills(); });
 }
 function renderSkills() {
