@@ -24,7 +24,7 @@ import sys
 import time
 from http.server import BaseHTTPRequestHandler
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -101,6 +101,16 @@ class handler(BaseHTTPRequestHandler):
         if r == "/api/skills":
             return self._send(200, [{"name": s.name, "departments": sorted(s.departments), "side_effect": s.side_effect,
                                      "description": s.description, "input_schema": s.input_schema} for s in fleet.skills])
+        if r == "/api/run":  # shareable link: /multiverse/api/run?goal=Who+is+Ada+Lovelace
+            goal = (parse_qs(urlparse(self.path).query).get("goal") or [""])[0].strip()[:4000]
+            if not goal:
+                return self._send(400, {"error": "add ?goal=... to the URL"})
+            try:
+                out = asyncio.run(fleet.run(goal)).to_dict()
+            except Exception as e:  # noqa: BLE001
+                return self._send(500, {"error": f"{type(e).__name__}: {e}"})
+            out["mode"] = "trusted" if trusted else "public"
+            return self._send(200, out)
         self._send(404, {"error": "not found"})
 
     def do_POST(self) -> None:  # noqa: N802
