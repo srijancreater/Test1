@@ -86,7 +86,7 @@ class handler(BaseHTTPRequestHandler):
             if p == prefix or p.startswith(prefix + "/"):
                 p = p[len(prefix):]
                 break
-        return p or "/"
+        return p or "/"  # "/" on the agent-multiverse-app domain is rewritten here too
 
     def do_GET(self) -> None:  # noqa: N802
         r = self._route()
