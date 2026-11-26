@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent Multiverse</title>
+<meta name="description" content="Give a goal to an orchestrator, its department managers and 1,000 worker agents.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Unbounded:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0d0a24; --void-2:#171142; --violet:#6b4cff; --teal:#2de2c8; --coral:#ff7a90;
+  --star:#eef0ff; --mist:rgba(226,230,255,.66); --faint:rgba(226,230,255,.38);
+  --glass:rgba(255,255,255,.065); --glass-hi:rgba(255,255,255,.11); --edge:rgba(255,255,255,.14);
+  --research:#2de2c8; --comms:#ff7aa8; --ops:#ffc861; --finance:#8cf5a2; --data:#69b7ff;
+  --r-lg:28px; --r-md:18px; --r-sm:12px;
+  --display:"Unbounded",system-ui,sans-serif; --body:"Figtree",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--void)}
+body{margin:0;min-height:100vh;color:var(--star);font:16px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+    radial-gradient(900px 600px at 12% -10%,rgba(107,76,255,.55),transparent 60%),
+    radial-gradient(700px 520px at 95% 8%,rgba(45,226,200,.28),transparent 60%),
+    radial-gradient(900px 700px at 70% 110%,rgba(255,122,144,.22),transparent 60%),
+    linear-gradient(180deg,var(--void-2),var(--void) 70%)}
+.wrap{max-width:1240px;margin:0 auto;padding:20px 16px 72px}
+.glass{background:var(--glass);border:1px solid var(--edge);border-radius:var(--r-lg);
+  backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 30px 60px -30px rgba(5,3,20,.8)}
+button,input,textarea{font:inherit;color:inherit}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+
+/* top bar */
+.bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 12px 10px 16px;border-radius:999px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:10px;font:600 15px var(--display);letter-spacing:.01em;margin-right:auto}
+.brand svg{flex:none}
+.mode{font-size:13px;color:var(--mist);padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--edge)}
+.mode b{font-weight:600;color:var(--star)}
+.mode.live b{color:var(--teal)}
+.token{display:flex;align-items:center;gap:8px}
+.token input{width:220px;max-width:52vw;background:rgba(5,3,20,.35);border:1px solid var(--edge);border-radius:999px;padding:8px 14px;font-size:14px}
+.token input::placeholder{color:var(--faint)}
+
+/* hero */
+.hero{position:relative;overflow:hidden;min-height:440px;padding:0}
+#sky{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero-copy{position:relative;z-index:1;padding:40px 40px 34px;max-width:560px;pointer-events:none}
+.hero h1{font:800 clamp(30px,4.6vw,54px)/1.04 var(--display);letter-spacing:-.02em;margin:0 0 16px}
+.hero p{color:var(--mist);margin:0;max-width:40ch;font-size:17px}
+.census{position:absolute;z-index:1;left:40px;right:40px;bottom:28px;display:flex;gap:34px;flex-wrap:wrap;pointer-events:none}
+.census div{min-width:90px}
+.census strong{display:block;font:600 30px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.census span{color:var(--mist);font-size:14px}
+
+/* command + results */
+.deck{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:18px;margin-top:18px}
+.panel{padding:26px}
+.panel h2{font:600 19px/1.25 var(--display);margin:0 0 6px}
+.panel .hint{color:var(--mist);margin:0 0 16px;font-size:15px}
+textarea{width:100%;min-height:128px;resize:vertical;background:rgba(5,3,20,.38);border:1px solid var(--edge);
+  border-radius:var(--r-md);padding:16px;font-size:16px;line-height:1.5}
+.ideas{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 18px}
+.idea{border:1px solid var(--edge);background:rgba(255,255,255,.05);border-radius:999px;padding:7px 13px;font-size:13.5px;color:var(--mist);cursor:pointer;transition:background .15s,color .15s}
+.idea:hover{background:var(--glass-hi);color:var(--star)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border:0;border-radius:999px;padding:12px 22px;font-weight:600;cursor:pointer;transition:transform .12s,filter .12s}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:linear-gradient(120deg,var(--violet),#8e6bff 45%,var(--teal));color:#fff;box-shadow:0 10px 30px -10px rgba(107,76,255,.9)}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn.ghost{background:rgba(255,255,255,.07);border:1px solid var(--edge);color:var(--star)}
+.btn.ghost:hover{background:var(--glass-hi)}
+.btn[disabled]{opacity:.55;cursor:progress}
+
+.results{min-height:100%}
+.empty{display:grid;place-items:center;text-align:center;color:var(--mist);min-height:260px;padding:20px}
+.empty svg{opacity:.7;margin-bottom:12px}
+.status{display:flex;align-items:center;gap:10px;margin:0 0 16px;font-weight:600}
+.status .pill{font-size:12.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--edge)}
+.pill.ok{color:var(--finance);border-color:rgba(140,245,162,.45);background:rgba(140,245,162,.08)}
+.pill.wait{color:var(--ops);border-color:rgba(255,200,97,.45);background:rgba(255,200,97,.08)}
+.pill.bad{color:var(--coral);border-color:rgba(255,122,144,.45);background:rgba(255,122,144,.08)}
+.pill.memo{color:var(--data);border-color:rgba(105,183,255,.45);background:rgba(105,183,255,.08)}
+ol.steps{list-style:none;margin:0;padding:0;position:relative}
+ol.steps::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--edge),transparent)}
+.step{position:relative;padding:0 0 18px 46px;animation:arrive .45s cubic-bezier(.2,.8,.2,1) both}
+.step .n{position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+  font:600 13px var(--display);color:var(--void);background:var(--c,var(--teal));box-shadow:0 0 18px var(--c,var(--teal))}
+.step h3{margin:3px 0 2px;font-size:16px;font-weight:600}
+.step .who{color:var(--mist);font-size:13.5px}
+.step .who em{font-style:normal;color:var(--c)}
+.out{margin-top:8px;background:rgba(5,3,20,.4);border:1px solid var(--edge);border-radius:var(--r-sm);padding:10px 12px;
+  font-size:14px;white-space:pre-wrap;word-break:break-word;max-height:180px;overflow:auto}
+.out.err{border-color:rgba(255,122,144,.4);color:#ffc2cc}
+.summary{margin-top:6px;padding:16px;border-radius:var(--r-md);background:rgba(255,255,255,.05);border:1px solid var(--edge);white-space:pre-wrap;font-size:15px}
+.meter{display:grid;gap:10px;margin-top:6px}
+.meter .row{display:grid;grid-template-columns:150px 1fr 64px;gap:12px;align-items:center;font-size:14px}
+.meter .track{height:10px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+.meter .fill{height:100%;border-radius:999px;background:var(--c);box-shadow:0 0 12px var(--c);transform-origin:left;animation:grow .9s cubic-bezier(.2,.8,.2,1) both}
+.meter .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--mist)}
+.bigstats{display:flex;gap:28px;flex-wrap:wrap;margin-bottom:18px}
+.bigstats strong{display:block;font:600 26px var(--display);font-variant-numeric:tabular-nums}
+.bigstats span{color:var(--mist);font-size:13.5px}
+
+/* departments */
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:38px 4px 14px;flex-wrap:wrap}
+.section-head h2{font:600 24px/1.2 var(--display);margin:0}
+.section-head p{margin:0;color:var(--mist)}
+.depts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.dept{padding:20px;border-radius:var(--r-md);position:relative;overflow:hidden}
+.dept::after{content:"";position:absolute;width:140px;height:140px;right:-50px;top:-60px;border-radius:50%;background:var(--c);filter:blur(50px);opacity:.38}
+.dept h3{font:600 15px var(--display);margin:0 0 2px;position:relative;overflow-wrap:anywhere}
+.dept .mgr{color:var(--mist);font-size:13.5px;margin:0 0 16px}
+.dept .count{font:800 34px/1 var(--display);color:var(--c);font-variant-numeric:tabular-nums}
+.dept .count small{font:500 13px var(--body);color:var(--mist);margin-left:6px}
+.dept .done{font-size:13px;color:var(--mist);margin-top:6px;min-height:20px}
+
+/* skills */
+.lib{padding:8px}
+.lib-tools{display:flex;gap:10px;padding:12px 12px 4px;flex-wrap:wrap}
+.lib-tools input{flex:1 1 240px;background:rgba(5,3,20,.38);border:1px solid var(--edge);border-radius:999px;padding:10px 16px}
+.lib-tools input::placeholder{color:var(--faint)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--edge);border-radius:999px;padding:7px 12px;font-size:13px;background:transparent;color:var(--mist);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--c,rgba(255,255,255,.15));color:var(--void);border-color:transparent;font-weight:600}
+.skill-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;padding:12px}
+.skill{padding:14px 16px;border-radius:var(--r-sm);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.skill code{font:600 14px var(--body);color:var(--star)}
+.skill p{margin:4px 0 10px;color:var(--mist);font-size:14px}
+.dots{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.gate{margin-left:auto;font-size:12px;color:var(--coral);border:1px solid rgba(255,122,144,.4);padding:2px 8px;border-radius:999px}
+.foot{margin-top:34px;color:var(--faint);font-size:13.5px;text-align:center}
+.foot a{color:var(--mist)}
+
+@keyframes arrive{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (max-width:980px){.deck{grid-template-columns:1fr}.depts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){
+  .hero{display:flex;flex-direction:column;min-height:0}
+  #sky{position:relative;inset:auto;height:300px;order:2}
+  .hero-copy{order:1}.census{position:relative;order:3;left:auto;right:auto;bottom:auto;padding:0 22px 26px}
+}
+@media (max-width:560px){
+  .hero-copy{padding:28px 22px 4px}.census{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
+  .depts{grid-template-columns:1fr}
+  .dept{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:12px;padding:16px 18px}
+  .dept .mgr{margin:0}.dept .count{grid-column:2;grid-row:1/span 3;text-align:right}
+  .dept .count small{display:block;margin:4px 0 0}.dept .done{margin-top:4px}
+  .census strong{font-size:24px}.panel{padding:20px}
+  .meter .row{grid-template-columns:96px 1fr 48px}.brand span{display:none}.token input{width:160px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="bar glass">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <circle cx="15" cy="15" r="4.5" fill="#eef0ff"/>
+        <ellipse cx="15" cy="15" rx="13" ry="5.5" fill="none" stroke="#2de2c8" stroke-width="1.6" transform="rotate(-28 15 15)"/>
+        <ellipse cx="15" cy="15" rx="13" ry="5.5" fill="none" stroke="#6b4cff" stroke-width="1.6" transform="rotate(32 15 15)"/>
+        <circle cx="26" cy="9.5" r="2" fill="#ff7aa8"/>
+      </svg>
+      <span>Agent Multiverse</span>
+    </div>
+    <div class="mode" id="mode">Connecting…</div>
+    <label class="token"><span class="sr-only">Access token</span>
+      <input id="token" type="password" autocomplete="off" placeholder="Access token" title="Optional: a token switches the agents from offline mode to Claude">
+    </label>
+  </header>
+
+  <section class="hero glass" aria-label="Live map of the agents">
+    <canvas id="sky" aria-hidden="true"></canvas>
+    <div class="hero-copy">
+      <h1>One goal in. A thousand agents on it.</h1>
+      <p>The orchestrator plans your goal, hands each step to a department manager, and their workers run the steps side by side.</p>
+    </div>
+    <div class="census" id="census">
+      <div><strong id="c-workers">–</strong><span>worker agents</span></div>
+      <div><strong id="c-managers">–</strong><span>managers</span></div>
+      <div><strong id="c-skills">–</strong><span>skills</span></div>
+      <div><strong id="c-done">0</strong><span>tasks finished here</span></div>
+    </div>
+  </section>
+
+  <div class="deck">
+    <section class="panel glass" aria-labelledby="ask">
+      <h2 id="ask">What should the agents do?</h2>
+      <p class="hint">Write it in plain words. Split steps with “;” or “then” and independent steps run at the same time.</p>
+      <textarea id="goal" aria-labelledby="ask">Calculate 1200*12*0.18; then summarize the result</textarea>
+      <div class="ideas" id="ideas"></div>
+      <div class="actions">
+        <button class="btn primary" id="run">Run goal</button>
+        <button class="btn ghost" id="demo">Stress test 3,000 tasks</button>
+      </div>
+    </section>
+
+    <section class="panel glass results" aria-live="polite" aria-labelledby="res">
+      <h2 id="res">Results</h2>
+      <div id="out">
+        <div class="empty">
+          <div>
+            <svg width="54" height="54" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="6" fill="#6b4cff"/><circle cx="27" cy="27" r="16" fill="none" stroke="rgba(255,255,255,.25)" stroke-dasharray="3 5"/><circle cx="27" cy="27" r="25" fill="none" stroke="rgba(255,255,255,.12)" stroke-dasharray="2 6"/><circle cx="43" cy="27" r="3" fill="#2de2c8"/><circle cx="10" cy="20" r="2.5" fill="#ffc861"/></svg>
+            <p>Run a goal and each step shows up here: which department took it, which worker ran it, and what came back.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="section-head">
+    <h2>Departments</h2>
+    <p>Each manager runs its own pool of workers.</p>
+  </div>
+  <div class="depts" id="depts"></div>
+
+  <div class="section-head">
+    <h2>Skill library</h2>
+    <p>Everything the workers know how to do.</p>
+  </div>
+  <section class="glass lib">
+    <div class="lib-tools">
+      <input id="q" type="search" placeholder="Find a skill, like email or budget" aria-label="Find a skill">
+      <div class="chips" id="filters" role="group" aria-label="Filter by department"></div>
+    </div>
+    <div class="skill-grid" id="skills"></div>
+  </section>
+
+  <p class="foot">Without an access token, goals run in offline mode: nothing is sent, posted or fetched from the web.
+    <a href="https://github.com/srijancreater/Test1/blob/ccr-9e52856c-z3otr6/docs/agent-multiverse.md">How it works</a></p>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const API = '/multiverse/api';
+const COLORS = {research:'#2de2c8', comms:'#ff7aa8', ops:'#ffc861', finance:'#8cf5a2', data:'#69b7ff'};
+const NAMES = {research:'Research', comms:'Communications', ops:'Operations', finance:'Finance', data:'Data'};
+const IDEAS = [
+  'Read files/inbox.txt and extract action items; then save them as a note',
+  'Calculate 2450*0.15; then draft an email to sam@example.com about the tip',
+  'Summarize: Q3 revenue grew 12%. Churn fell to 2.1%. Hiring is paused until January.',
+  'Split a 186 bill between 4 people',
+];
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt = n => Number(n).toLocaleString();
+const headers = () => { const t = $('token').value.trim(); return Object.assign({'Content-Type':'application/json'}, t ? {Authorization:'Bearer ' + t} : {}); };
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let state = {managers: [], skills: [], filter: '', done: 0};
+
+/* ---------- constellation ---------- */
+const sky = $('sky'), ctx = sky.getContext('2d');
+let W = 0, H = 0, DPR = 1, nodes = [], hubs = [], t0 = performance.now(), flashes = {};
+function layout() {
+  const r = sky.getBoundingClientRect(); DPR = Math.min(devicePixelRatio || 1, 2);
+  W = r.width; H = r.height; sky.width = W * DPR; sky.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+function seed() {
+  const wide = innerWidth > 760;
+  const cx = wide ? W * 0.7 : W * 0.5, cy = H * 0.5;
+  const R = Math.min(wide ? W * 0.27 : W * 0.42, H * 0.46);
+  hubs = state.managers.map((m, i) => {
+    const a = -Math.PI / 2 + i * 2 * Math.PI / state.managers.length;
+    return {dept: m.department, a, r: R * 0.62, cx, cy, c: COLORS[m.department] || '#fff'};
+  });
+  nodes = [];
+  const total = state.managers.reduce((s, m) => s + m.workers, 0) || 1;
+  const cap = Math.min(total, W < 560 ? 450 : 1000);
+  state.managers.forEach((m, i) => {
+    const n = Math.round(cap * m.workers / total);
+    for (let k = 0; k < n; k++) {
+      const spread = 0.18 + Math.random() * 0.42;
+      nodes.push({h: i, a: Math.random() * Math.PI * 2, d: R * spread * (0.35 + Math.random()),
+        s: (0.15 + Math.random() * 0.5) * (Math.random() < .5 ? -1 : 1), z: 0.6 + Math.random() * 1.2, tw: Math.random() * 6});
+    }
+  });
+  stars = Array.from({length: 90}, () => ({x: Math.random() * W, y: Math.random() * H, z: Math.random()}));
+}
+let stars = [];
+function draw(now) {
+  const t = (now - t0) / 1000;
+  ctx.clearRect(0, 0, W, H);
+  for (const s of stars) { ctx.fillStyle = `rgba(230,235,255,${0.15 + s.z * 0.35})`; ctx.fillRect(s.x, s.y, 1.2, 1.2); }
+  if (!hubs.length) return;
+  const {cx, cy} = hubs[0];
+  const spin = reduce ? 0 : t * 0.04;
+  const pos = hubs.map(h => [cx + Math.cos(h.a + spin) * h.r, cy + Math.sin(h.a + spin) * h.r * 0.78]);
+  // orbit ring
+  ctx.strokeStyle = 'rgba(255,255,255,.08)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.ellipse(cx, cy, hubs[0].r, hubs[0].r * 0.78, 0, 0, Math.PI * 2); ctx.stroke();
+  // beams orchestrator -> managers
+  hubs.forEach((h, i) => {
+    const f = flashes[h.dept] ? Math.max(0, 1 - (now - flashes[h.dept]) / 2200) : 0;
+    const g = ctx.createLinearGradient(cx, cy, pos[i][0], pos[i][1]);
+    g.addColorStop(0, 'rgba(255,255,255,.35)'); g.addColorStop(1, h.c + (f > 0 ? 'ff' : '55'));
+    ctx.strokeStyle = g; ctx.lineWidth = 1 + f * 2.5;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(pos[i][0], pos[i][1]); ctx.stroke();
+  });
+  // workers
+  for (const n of nodes) {
+    const h = hubs[n.h], p = pos[n.h];
+    const a = n.a + (reduce ? 0 : t * n.s * 0.5);
+    const x = p[0] + Math.cos(a) * n.d, y = p[1] + Math.sin(a) * n.d * 0.8;
+    const f = flashes[h.dept] ? Math.max(0, 1 - (now - flashes[h.dept]) / 2200) : 0;
+    const tw = reduce ? 0.7 : 0.55 + 0.45 * Math.sin(t * 1.6 + n.tw);
+    ctx.globalAlpha = Math.min(1, 0.35 + tw * 0.45 + f * 0.6);
+    ctx.fillStyle = h.c;
+    ctx.beginPath(); ctx.arc(x, y, n.z * (1 + f * 0.9), 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  // managers
+  hubs.forEach((h, i) => {
+    const [x, y] = pos[i];
+    const glow = ctx.createRadialGradient(x, y, 0, x, y, 34);
+    glow.addColorStop(0, h.c + 'aa'); glow.addColorStop(1, h.c + '00');
+    ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, 34, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = h.c; ctx.beginPath(); ctx.arc(x, y, 6.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(238,240,255,.85)'; ctx.font = '600 12px Figtree, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(NAMES[h.dept] || h.dept, x, y + 26);
+  });
+  // orchestrator
+  const pulse = reduce ? 0 : (Math.sin(t * 2) + 1) / 2;
+  const og = ctx.createRadialGradient(cx, cy, 0, cx, cy, 60 + pulse * 10);
+  og.addColorStop(0, 'rgba(255,255,255,.9)'); og.addColorStop(.25, 'rgba(142,107,255,.6)'); og.addColorStop(1, 'rgba(107,76,255,0)');
+  ctx.fillStyle = og; ctx.beginPath(); ctx.arc(cx, cy, 70, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(cx, cy, 9, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'rgba(238,240,255,.9)'; ctx.font = '600 12px Figtree, sans-serif'; ctx.fillText('Orchestrator', cx, cy + 30);
+}
+function loop(now) { draw(now); if (!reduce || Object.keys(flashes).length) requestAnimationFrame(loop); }
+function flash(depts) { const now = performance.now(); depts.forEach(d => flashes[d] = now); if (reduce) requestAnimationFrame(loop); }
+addEventListener('resize', () => { layout(); seed(); if (reduce) draw(performance.now()); });
+
+/* ---------- data ---------- */
+async function load() {
+  try {
+    const st = await (await fetch(API + '/status', {headers: headers()})).json();
+    state.managers = st.managers;
+    const trusted = String(st.mode).startsWith('trusted');
+    $('mode').className = 'mode' + (trusted ? ' live' : '');
+    $('mode').innerHTML = trusted ? `<b>Claude connected</b>` : `<b>Offline mode</b>`;
+    $('c-workers').textContent = fmt(st.workers); $('c-managers').textContent = st.managers.length; $('c-skills').textContent = st.skills;
+    renderDepts();
+    const sk = await (await fetch(API + '/skills', {headers: headers()})).json();
+    state.skills = sk; renderFilters(); renderSkills();
+    layout(); seed(); requestAnimationFrame(loop);
+  } catch (e) {
+    $('mode').innerHTML = '<b>Unreachable</b>';
+    $('out').innerHTML = `<div class="empty"><p>The agents could not be reached (${esc(e.message)}). Reload the page to try again.</p></div>`;
+  }
+}
+function renderDepts() {
+  $('depts').innerHTML = state.managers.map(m => `
+    <article class="dept glass" style="--c:${COLORS[m.department] || '#fff'}">
+      <h3>${esc(NAMES[m.department] || m.department)}</h3>
+      <p class="mgr">${esc(m.manager)}</p>
+      <div class="count">${fmt(m.workers)}<small>workers</small></div>
+      <div class="done" id="done-${esc(m.department)}">${m.skills.length} skills</div>
+    </article>`).join('');
+}
+function renderFilters() {
+  const ds = state.managers.map(m => m.department);
+  $('filters').innerHTML = ['', ...ds].map(d =>
+    `<button class="chip" data-d="${d}" aria-pressed="${state.filter === d}" style="--c:${COLORS[d] || 'rgba(255,255,255,.85)'}">${d ? esc(NAMES[d] || d) : 'All'}</button>`).join('');
+  $('filters').querySelectorAll('.chip').forEach(b => b.onclick = () => { state.filter = b.dataset.d; renderFilters(); renderSkills(); });
+}
+function renderSkills() {
+  const q = $('q').value.trim().toLowerCase();
+  const list = state.skills.filter(s => (!state.filter || s.departments.includes(state.filter)) &&
+    (!q || (s.name + ' ' + s.description).toLowerCase().includes(q)));
+  $('skills').innerHTML = list.length ? list.map(s => `
+    <div class="skill"><code>${esc(s.name)}</code><p>${esc(s.description)}</p>
+      <div class="dots">${s.departments.map(d => `<span class="dot" style="--c:${COLORS[d]}" title="${esc(NAMES[d] || d)}"></span>`).join('')}
+      ${s.side_effect ? '<span class="gate">asks before acting</span>' : ''}</div></div>`).join('')
+    : `<p style="padding:8px 4px;color:var(--mist)">No skill matches “${esc(q)}”. Try a broader word, or clear the department filter.</p>`;
+}
+$('q').addEventListener('input', renderSkills);
+$('ideas').innerHTML = IDEAS.map((t, i) => `<button class="idea" data-i="${i}">${esc(t.length > 46 ? t.slice(0, 44) + '…' : t)}</button>`).join('');
+$('ideas').querySelectorAll('.idea').forEach(b => b.onclick = () => { $('goal').value = IDEAS[b.dataset.i]; $('goal').focus(); });
+$('token').addEventListener('change', load);
+
+function busy(on, label) {
+  $('run').disabled = $('demo').disabled = on;
+  if (on) $('out').innerHTML = `<div class="empty"><p>${label}</p></div>`;
+}
+function show(v) { return typeof v === 'string' ? v : JSON.stringify(v, null, 2); }
+
+$('run').onclick = async () => {
+  const goal = $('goal').value.trim();
+  if (!goal) { $('goal').focus(); return; }
+  busy(true, 'The orchestrator is planning your goal…');
+  try {
+    const r = await fetch(API + '/run', {method: 'POST', headers: headers(), body: JSON.stringify({goal})});
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    flash([...new Set(d.steps.map(s => s.department).filter(Boolean))]);
+    state.done += d.steps.filter(s => s.ok).length; $('c-done').textContent = fmt(state.done);
+    const pill = d.waiting_approval?.length ? '<span class="pill wait">Waiting for approval</span>'
+      : d.ok ? '<span class="pill ok">Done</span>' : '<span class="pill bad">Some steps failed</span>';
+    $('out').innerHTML = `
+      <div class="status">${pill}${d.from_playbook ? '<span class="pill memo">Reused a learned plan</span>' : ''}</div>
+      <ol class="steps">${d.steps.map((s, i) => `
+        <li class="step" style="--c:${COLORS[s.department] || '#fff'};animation-delay:${i * 90}ms">
+          <span class="n">${i + 1}</span>
+          <h3>${esc(s.goal)}</h3>
+          <div class="who"><em>${esc(NAMES[s.department] || s.department || 'Agent')}</em> handled it with ${esc(s.skill || 'reasoning')}${s.worker ? ', worker ' + esc(s.worker) : ''}</div>
+          <div class="out${s.ok ? '' : ' err'}">${esc(s.ok ? show(s.output) : s.error)}</div>
+        </li>`).join('')}</ol>
+      ${d.steps.length > 1 && !/^\[(ok|FAIL)\]/.test(d.summary) ? `<div class="summary">${esc(d.summary)}</div>` : ''}`;
+  } catch (e) {
+    $('out').innerHTML = `<div class="empty"><p>The goal did not run: ${esc(e.message)}. Check the wording and try again.</p></div>`;
+  } finally { busy(false); }
+};
+
+$('demo').onclick = async () => {
+  busy(true, 'Sending 3,000 tasks across every department…');
+  try {
+    const d = await (await fetch(API + '/demo', {method: 'POST', headers: headers(), body: JSON.stringify({tasks: 3000})})).json();
+    if (d.error) throw new Error(d.error);
+    flash(state.managers.map(m => m.department));
+    state.done += d.ok; $('c-done').textContent = fmt(state.done);
+    const max = Math.max(...Object.values(d.by_manager), 1);
+    const rows = state.managers.map(m => [m, d.by_manager[m.manager] || 0]);
+    rows.forEach(([m, v]) => { const el = $('done-' + m.department); if (el) el.textContent = fmt(v) + ' tasks in the stress test'; });
+    $('out').innerHTML = `
+      <div class="status">${d.failed ? `<span class="pill bad">${fmt(d.failed)} failed</span>` : '<span class="pill ok">All tasks finished</span>'}</div>
+      <div class="bigstats">
+        <div><strong>${fmt(d.ok)}</strong><span>tasks finished</span></div>
+        <div><strong>${d.seconds}s</strong><span>total time</span></div>
+        <div><strong>${fmt(d.tasks_per_second)}</strong><span>tasks per second</span></div>
+        <div><strong>${fmt(d.distinct_workers)}</strong><span>workers took part</span></div>
+      </div>
+      <div class="meter">${rows.map(([m, v], i) => `
+        <div class="row" style="--c:${COLORS[m.department]}"><span>${esc(NAMES[m.department] || m.department)}</span>
+          <div class="track"><div class="fill" style="width:${(v / max * 100).toFixed(1)}%;animation-delay:${i * 80}ms"></div></div>
+          <span class="v">${fmt(v)}</span></div>`).join('')}</div>`;
+  } catch (e) {
+    $('out').innerHTML = `<div class="empty"><p>The stress test did not run: ${esc(e.message)}. Reload the page and try again.</p></div>`;
+  } finally { busy(false); }
+};
+
+layout(); load();
+</script>
+</body>
+</html>
