@@ -75,12 +75,11 @@ def write_json(tenders: list[Tender], path: str | Path) -> None:
 
 # ---------------------------------------------------------------- html
 _CSS = """
-:root{--bg:#f7f7f5;--card:#fff;--ink:#1d1f23;--muted:#62666d;--line:#e4e4e0;--accent:#2f5bd3;
---urgent:#c2410c;--good:#15803d;--chip:#eef1fb}
-@media (prefers-color-scheme:dark){:root{--bg:#141518;--card:#1c1e22;--ink:#e8e9eb;--muted:#9a9ea6;
---line:#2c2f35;--accent:#7c9cff;--urgent:#fb923c;--good:#4ade80;--chip:#252a3a}}
+:root{--bg:#ffffff;--card:#ffffff;--ink:#1d1f23;--muted:#555a62;--line:#e2e2e6;--accent:#2f5bd3;
+--urgent:#c2410c;--good:#15803d;--chip:#eef1fb;color-scheme:light}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
-font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+font:14px/1.5 Verdana,Geneva,sans-serif}
+button,input,select,textarea{font-family:inherit}
 main{max-width:1200px;margin:0 auto;padding:24px 16px 64px}
 h1{font-size:22px;margin:0 0 4px}.sub{color:var(--muted);margin:0 0 20px}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
