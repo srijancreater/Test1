@@ -7,7 +7,24 @@
     "api/index.py": {
       "includeFiles": "{tender_radar,config,data}/**",
       "maxDuration": 30
+    },
+    "api/fleet.py": {
+      "includeFiles": "{agent_fleet,config,skills_contrib}/**",
+      "maxDuration": 60
     }
   },
-  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
+  "rewrites": [
+    {
+      "source": "/fleet",
+      "destination": "/api/fleet"
+    },
+    {
+      "source": "/fleet/(.*)",
+      "destination": "/api/fleet"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
+  ]
 }

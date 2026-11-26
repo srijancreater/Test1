@@ -216,7 +216,8 @@ def load_config(path: str | Path | None = None) -> dict[str, Any]:
 
 
 def build_fleet(config: str | Path | dict[str, Any] | None = None, *, llm: str | LLMBackend | None = None,
-                workspace: str | Path | None = None, scale: float = 1.0, approval_policy: str | None = None) -> Fleet:
+                workspace: str | Path | None = None, scale: float = 1.0, approval_policy: str | None = None,
+                exclude_skills: list[str] | None = None) -> Fleet:
     cfg = config if isinstance(config, dict) else load_config(config)
     fc = cfg.get("fleet", {})
     ws = Path(workspace or fc.get("workspace", ROOT / ".fleet")).resolve()
@@ -237,6 +238,8 @@ def build_fleet(config: str | Path | dict[str, Any] | None = None, *, llm: str |
             fleet.skills.register(s)
     for d in fc.get("skill_dirs", ["skills_contrib"]):
         fleet.skills.load_directory(d if Path(d).is_absolute() else ROOT / d)
+    for name in exclude_skills or []:
+        fleet.skills.unregister(name)
     depts = cfg.get("department") or [
         {"name": "research", "workers": 20}, {"name": "comms", "workers": 20}, {"name": "ops", "workers": 20},
         {"name": "finance", "workers": 10}, {"name": "data", "workers": 10}]

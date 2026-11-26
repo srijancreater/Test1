@@ -112,6 +112,9 @@ class SkillRegistry:
         self._skills[s.name] = s
         return s
 
+    def unregister(self, name: str) -> None:
+        self._skills.pop(name, None)
+
     def get(self, name: str) -> Skill:
         if name not in self._skills:
             raise KeyError(f"unknown skill: {name}")
